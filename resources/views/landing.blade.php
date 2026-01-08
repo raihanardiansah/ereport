@@ -275,52 +275,15 @@
                                 <span class="px-4 py-2 bg-white/5 rounded-lg text-sm text-gray-300">Filter Canggih</span>
                             </div>
                         </div>
-                        <div class="flex-1 rounded-2xl overflow-hidden shadow-2xl relative min-h-[300px] h-full group">
-                            <!-- Gradient Background -->
-                            <div class="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-600 opacity-90"></div>
-                            
-                            <!-- Animated Gradient Overlay -->
-                            <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/30 via-pink-500/20 to-orange-500/30 animate-pulse"></div>
-                            
-                            <!-- Pattern Overlay -->
-                            <div class="absolute inset-0 opacity-10">
-                                <div class="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.1)_25%,rgba(255,255,255,0.1)_50%,transparent_50%,transparent_75%,rgba(255,255,255,0.1)_75%,rgba(255,255,255,0.1))] bg-[length:60px_60px]"></div>
-                            </div>
-                            
-                            <!-- Content -->
-                            <div class="relative h-full flex flex-col items-center justify-center p-8 text-white">
-                                <!-- Clipboard Icon -->
-                                <div class="mb-6 transform group-hover:scale-110 transition-transform duration-300">
-                                    <svg class="w-24 h-24 text-white drop-shadow-2xl" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-                                    </svg>
-                                </div>
-                                
-                                <!-- Text -->
-                                <h4 class="text-2xl font-bold mb-2 text-center drop-shadow-lg">Laporan Digital</h4>
-                                <p class="text-white/90 text-center text-sm max-w-xs">Kelola semua laporan siswa dalam satu platform yang terintegrasi</p>
-                                
-                                <!-- Stats -->
-                                <div class="mt-8 grid grid-cols-3 gap-4 w-full max-w-sm">
-                                    <div class="text-center bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                                        <div class="text-2xl font-bold">50K+</div>
-                                        <div class="text-xs text-white/80">Laporan</div>
-                                    </div>
-                                    <div class="text-center bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                                        <div class="text-2xl font-bold">500+</div>
-                                        <div class="text-xs text-white/80">Sekolah</div>
-                                    </div>
-                                    <div class="text-center bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                                        <div class="text-2xl font-bold">99%</div>
-                                        <div class="text-xs text-white/80">Akurasi</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Floating Particles -->
-                            <div class="absolute top-10 left-10 w-2 h-2 bg-white/40 rounded-full animate-ping"></div>
-                            <div class="absolute bottom-20 right-10 w-3 h-3 bg-white/30 rounded-full animate-pulse"></div>
-                            <div class="absolute top-1/2 right-20 w-2 h-2 bg-white/50 rounded-full animate-bounce"></div>
+                        <div class="flex-1 rounded-2xl overflow-hidden shadow-2xl relative min-h-[300px] h-full group bg-black">
+                            <iframe 
+                                class="absolute inset-0 w-full h-full"
+                                src="https://www.youtube.com/embed/_o_LpWK9PYQ?si=xBAbmol_CI_Zql5O&autoplay=1&mute=1&loop=1&playlist=_o_LpWK9PYQ&controls=1&rel=0" 
+                                title="App Demo"
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                            </iframe>
                         </div>
                     </div>
                 </div>

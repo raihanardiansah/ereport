@@ -251,6 +251,9 @@ document.getElementById('checkout-form').addEventListener('submit', async functi
         }
     }
     
+    // Get promo code
+    const promoCode = document.getElementById('promo-code-input').value;
+    
     try {
         // Create transaction via Midtrans
         const response = await fetch('{{ route("subscriptions.process", $package) }}', {
@@ -262,7 +265,8 @@ document.getElementById('checkout-form').addEventListener('submit', async functi
             },
             body: JSON.stringify({
                 payment_method: paymentMethod.value,
-                bank_va: bankVa
+                bank_va: bankVa,
+                promo_code: promoCode
             })
         });
         
@@ -284,13 +288,15 @@ document.getElementById('checkout-form').addEventListener('submit', async functi
                 window.location.href = '{{ url("subscriptions/waiting") }}/' + data.order_id;
             }
         } else {
-            showToast('Gagal membuat transaksi: ' + (data.error || 'Unknown error'), 'error');
+            // Generic error message instead of specific data.error
+            showToast('Gagal memproses transaksi. Silakan coba lagi.', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }
     } catch (error) {
         console.error('Error:', error);
-        showToast('Terjadi kesalahan: ' + error.message, 'error');
+        // Generic error message for user
+        showToast('Terjadi gangguan koneksi. Silakan coba sesaat lagi.', 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     }

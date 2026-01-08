@@ -205,4 +205,62 @@ PROMPT;
             'score' => $result['confidence'],
         ];
     }
+    /**
+     * Generate a concise title for the report based on its content.
+     * 
+     * @param string $content Report content
+     * @return string Generated title
+     */
+    public function generateTitle(string $content): string
+    {
+        try {
+            $prompt = <<<PROMPT
+Anda adalah asisten admin sekolah.
+Buatlah JUDUL SANGAT SINGKAT (maksimal 5-7 kata) yang merangkum isi laporan berikut.
+Judul harus formal, objektif, dan langsung pada inti masalah.
+Jangan gunakan kata "Laporan" atau "Tentang" di awal.
+
+ISI LAPORAN:
+{$content}
+
+JUDUL SINGKAT:
+PROMPT;
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])
+            ->timeout(15) // Fast timeout for title
+            ->post("{$this->endpoint}?key={$this->apiKey}", [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $prompt]
+                        ]
+                    ]
+                ],
+                'generationConfig' => [
+                    'temperature' => 0.3, // Lower temperature for more deterministic titles
+                    'maxOutputTokens' => 20, // Short output
+                ],
+            ]);
+
+            if ($response->failed()) {
+                Log::error('Gemini Title Generation Failed', ['status' => $response->status()]);
+                return 'Laporan Baru'; // Fallback
+            }
+
+            $result = $response->json();
+            $title = $result['candidates'][0]['content']['parts'][0]['text'] ?? 'Laporan Baru';
+            
+            // Clean up title
+            $title = trim(str_replace(['"', "'", "*"], '', $title));
+            
+            // Truncate if too long (backup safety)
+            return Str::limit($title, 100);
+
+        } catch (\Throwable $e) {
+            Log::error('Title Generation Error', ['error' => $e->getMessage()]);
+            return 'Laporan Baru';
+        }
+    }
 }

@@ -40,7 +40,7 @@
                         <div class="relative group cursor-pointer" onclick="openImageModal('{{ $attachmentUrl }}')">
                             <img src="{{ $attachmentUrl }}" 
                                  alt="Lampiran Laporan" 
-                                 class="max-w-full max-h-64 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow object-contain"
+                                 class="w-full md:w-auto h-auto max-h-48 md:max-h-96 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow object-contain mx-auto"
                                  onerror="this.parentElement.innerHTML='<div class=\'flex items-center justify-center h-32 bg-gray-100 rounded-lg border border-gray-200\'><p class=\'text-sm text-red-500\'>Gambar tidak dapat dimuat. Pastikan storage link sudah dibuat.</p></div>'">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
                                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,7 +289,7 @@
                             @if($report->ai_classification === 'positif') bg-green-100 text-green-700
                             @elseif($report->ai_classification === 'negatif') bg-red-100 text-red-700
                             @else bg-gray-100 text-gray-700 @endif">
-                            🤖 {{ ucfirst($report->ai_classification ?? 'Netral') }}
+                            {{ ucfirst($report->ai_classification ?? 'Netral') }}
                         </span>
                     </div>
 
@@ -315,7 +315,7 @@
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-sm text-gray-600">AI Deteksi:</span>
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                            🤖 {{ ucfirst($report->ai_category ?? 'Tidak terdeteksi') }}
+                            {{ ucfirst($report->ai_category ?? 'Tidak terdeteksi') }}
                         </span>
                     </div>
 

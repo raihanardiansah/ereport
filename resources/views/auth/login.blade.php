@@ -39,7 +39,7 @@
         <!-- Username -->
         <div>
             <label for="username" class="block text-sm font-medium text-gray-700 mb-1">
-                Username
+                Username, Email, atau No. HP
             </label>
             <input 
                 type="text" 
@@ -47,7 +47,7 @@
                 name="username" 
                 value="{{ old('username') }}"
                 class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3CB371] focus:border-[#3CB371] transition-all text-sm @error('username') border-danger-500 @enderror"
-                placeholder="Masukkan username"
+                placeholder="Masukkan username, email, atau no. HP"
                 required
                 autofocus
             >

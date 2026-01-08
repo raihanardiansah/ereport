@@ -39,16 +39,15 @@ class AuthController extends Controller
         'username' => [
             'required',
             'string',
-            'min:8',
-            'max:30',
-            'regex:/^[a-z0-9]+$/', // lowercase alphanumeric only
+            'min:3', 
+            'max:255',
         ],
         'password' => 'required|string|min:8',
         'g-recaptcha-response' => 'required',
     ], [
-        'username.regex' => 'Username hanya boleh huruf kecil dan angka tanpa spasi.',
-        'username.min' => 'Username minimal 8 karakter.',
-        'username.max' => 'Username maksimal 30 karakter.',
+        'username.required' => 'Username, Email, atau No. HP wajib diisi.',
+        'username.min' => 'Input minimal 3 karakter.',
+        'username.max' => 'Input maksimal 255 karakter.',
         'password.min' => 'Password minimal 8 karakter.',
         'g-recaptcha-response.required' => 'Silakan centang reCAPTCHA.',
     ]);
@@ -60,7 +59,6 @@ class AuthController extends Controller
         $resp = $recaptcha->verify($request->input('g-recaptcha-response'), $request->ip());
         
         if (!$resp->isSuccess()) {
-            // In local development, log the error but don't block login
             if (config('app.env') === 'local') {
                 \Log::warning('reCAPTCHA verification failed in local environment', [
                     'errors' => $resp->getErrorCodes()
@@ -70,22 +68,30 @@ class AuthController extends Controller
             }
         }
     } catch (\Exception $e) {
-        // Handle connection errors (timeout, network issues, etc.)
         \Log::error('reCAPTCHA verification error: ' . $e->getMessage());
         
-        // In production, show a user-friendly error
         if (config('app.env') !== 'local') {
             return back()->withErrors(['g-recaptcha-response' => 'Tidak dapat memverifikasi reCAPTCHA. Silakan coba lagi.'])->withInput();
         }
-        // In local development, continue with login
     }
 
-        // Find user by username
-        $user = User::where('username', $request->username)->first();
+        // Determine input type
+        $loginValue = $request->username;
+        $loginType = 'username';
+
+        if (filter_var($loginValue, FILTER_VALIDATE_EMAIL)) {
+            $loginType = 'email';
+        } elseif (preg_match('/^[0-9+-\s]+$/', $loginValue) && strlen(preg_replace('/[^0-9]/', '', $loginValue)) >= 10) {
+            $loginType = 'phone';
+            // Optional: Normalize phone number here if needed (e.g. remove spaces/dashes)
+        }
+
+        // Find user
+        $user = User::where($loginType, $loginValue)->first();
 
         if (!$user) {
             throw ValidationException::withMessages([
-                'username' => ['Username tidak ditemukan.'],
+                'username' => ['Akun tidak ditemukan.'],
             ]);
         }
 

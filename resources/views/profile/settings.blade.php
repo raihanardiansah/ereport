@@ -139,7 +139,7 @@
             <div class="grid md:grid-cols-2 gap-4 text-sm">
                 <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <p class="text-gray-500 dark:text-gray-400 mb-1">Akun Dibuat</p>
-                    <p class="font-medium text-gray-900 dark:text-gray-100">{{ $user->created_at->translatedFormat('d F Y') }}</p>
+                    <p class="font-medium text-gray-900 dark:text-gray-100">{{ $user->created_at?->translatedFormat('d F Y') ?? '-' }}</p>
                 </div>
                 <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <p class="text-gray-500 dark:text-gray-400 mb-1">Login Terakhir</p>

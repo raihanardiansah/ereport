@@ -54,18 +54,22 @@
                         @error('phone')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Kota</label>
-                        <input type="text" name="city" value="{{ old('city') }}" maxlength="50"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                            placeholder="Jakarta">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
+                        <select name="province" id="province-select" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="">Pilih Provinsi</option>
+                        </select>
+                        <input type="hidden" name="province_name" id="province_name">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
-                    <input type="text" name="province" value="{{ old('province') }}" maxlength="50"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                        placeholder="DKI Jakarta">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kota/Kabupaten</label>
+                    <select name="city" id="city-select" required disabled
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50 text-gray-500">
+                        <option value="">Pilih Provinsi Terlebih Dahulu</option>
+                    </select>
+                    <input type="hidden" name="city_name" id="city_name">
                 </div>
 
                 <div>
@@ -194,5 +198,105 @@
             eyeOff.classList.add('hidden');
         }
     }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const provinceSelect = document.getElementById('province-select');
+        const citySelect = document.getElementById('city-select');
+        
+        // Helper to convert to Title Case
+        const toTitleCase = (str) => {
+            return str.replace(/\w\S*/g, (txt) => {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        };
+
+        // Old values from Laravel
+        const oldProvince = "{{ old('province') }}";
+        const oldCity = "{{ old('city') }}";
+
+        try {
+            // Fetch Provinces
+            const response = await fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json');
+            let provinces = await response.json();
+            
+            // Sort alphabetically
+            provinces.sort((a, b) => a.name.localeCompare(b.name));
+
+            provinces.forEach(province => {
+                const option = document.createElement('option');
+                const name = toTitleCase(province.name);
+                option.value = name;
+                option.textContent = name;
+                option.dataset.id = province.id;
+                
+                if (oldProvince && oldProvince === name) {
+                    option.selected = true;
+                }
+                
+                provinceSelect.appendChild(option);
+            });
+
+            // Trigger change if we have an old province to load cities
+            if (oldProvince) {
+                // Find selected option to get ID
+                const selectedOption = Array.from(provinceSelect.options).find(opt => opt.value === oldProvince);
+                if (selectedOption) {
+                    loadCities(selectedOption.dataset.id, oldCity);
+                }
+            }
+
+        } catch (error) {
+            console.error('Error fetching provinces:', error);
+            provinceSelect.innerHTML += '<option value="">Gagal memuat data</option>';
+        }
+
+        // Listener for Province Change
+        provinceSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const provinceId = selectedOption.dataset.id;
+            
+            if (provinceId) {
+                loadCities(provinceId);
+            } else {
+                citySelect.innerHTML = '<option value="">Pilih Provinsi Terlebih Dahulu</option>';
+                citySelect.disabled = true;
+                citySelect.classList.add('bg-gray-50', 'text-gray-500');
+            }
+        });
+
+        async function loadCities(provinceId, selectedCity = null) {
+            citySelect.innerHTML = '<option value="">Loading...</option>';
+            citySelect.disabled = true;
+            citySelect.classList.remove('bg-gray-50', 'text-gray-500');
+
+            try {
+                const response = await fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provinceId}.json`);
+                let regencies = await response.json();
+                
+                // Sort alphabetically
+                regencies.sort((a, b) => a.name.localeCompare(b.name));
+
+                citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+                
+                regencies.forEach(regency => {
+                    const option = document.createElement('option');
+                    const name = toTitleCase(regency.name);
+                    option.value = name;
+                    option.textContent = name;
+                    
+                    if (selectedCity && selectedCity === name) {
+                        option.selected = true;
+                    }
+                    
+                    citySelect.appendChild(option);
+                });
+                
+                citySelect.disabled = false;
+            } catch (error) {
+                console.error('Error fetching regencies:', error);
+                citySelect.innerHTML = '<option value="">Gagal memuat kota</option>';
+            }
+        }
+    });
 </script>
 </x-layouts.guest>

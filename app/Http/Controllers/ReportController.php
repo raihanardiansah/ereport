@@ -113,7 +113,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
 
         $validated = $request->validate([
             'title' => [
-                'required',
+                'nullable', // AI will generate if empty
                 'string',
                 'max:100',
             ],
@@ -158,6 +158,12 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'attachment.max' => 'Ukuran file maksimal 3MB.',
         ]);
 
+        // Generate title if missing
+        $title = $validated['title'] ?? null;
+        if (empty($title)) {
+            $title = $this->sentimentService->generateTitle($validated['content']);
+        }
+
         // Verify reported user belongs to same school (if specified) - backward compatibility
         $reportedUserId = null;
         if (!empty($validated['reported_user_id'])) {
@@ -189,7 +195,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
         }
 
         // Use Google Gemini AI for sentiment AND category analysis
-        $aiResult = $this->sentimentService->analyzeReport($validated['title'], $validated['content']);
+        $aiResult = $this->sentimentService->analyzeReport($title, $validated['content']);
 
         // Use user-selected category or fallback to AI-suggested category
         $userCategory = $validated['category'] ?? null;
@@ -199,7 +205,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'school_id' => $user->school_id,
             'user_id' => $user->id,
             'reported_user_id' => $reportedUserId,
-            'title' => $validated['title'],
+            'title' => $title,
             'content' => $validated['content'],
             'category' => $finalCategory,
             'attachment_path' => $attachmentPath,

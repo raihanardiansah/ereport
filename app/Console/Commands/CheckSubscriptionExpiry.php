@@ -32,7 +32,7 @@ class CheckSubscriptionExpiry extends Command
         foreach ($warningDays as $days) {
             $targetDate = now()->addDays($days)->toDateString();
             
-            $subscriptions = Subscription::whereDate('end_date', $targetDate)
+            $subscriptions = Subscription::whereDate('expires_at', $targetDate)
                 ->where('status', 'active')
                 ->with(['school', 'package'])
                 ->get();
@@ -44,18 +44,34 @@ class CheckSubscriptionExpiry extends Command
             }
         }
 
-        // Also check for expired subscriptions (just expired today)
-        $expiredToday = Subscription::whereDate('end_date', now()->subDay()->toDateString())
+        // Also check for expired subscriptions (just expired today or yesterday)
+        // Check "expired_at" < now() AND status="active"
+        $expiredSubscriptions = Subscription::where('expires_at', '<', now())
             ->where('status', 'active')
             ->with(['school', 'package'])
             ->get();
 
-        foreach ($expiredToday as $subscription) {
+        foreach ($expiredSubscriptions as $subscription) {
             $this->line("Sending expired notice to: {$subscription->school->name}");
             EmailService::notifySubscriptionExpiring($subscription, 0);
             
-            // Update status to expired
+            // Update subscription status
             $subscription->update(['status' => 'expired']);
+
+            // Update school status
+            $subscription->school->update(['subscription_status' => 'expired']);
+            
+            // Log audit
+            \App\Models\AuditLog::create([
+                'user_id' => null, // System
+                'action' => 'subscription_expired_auto',
+                'model_type' => Subscription::class,
+                'model_id' => $subscription->id,
+                'description' => "Langganan paket {$subscription->package->name} telah berakhir otomatis.",
+                'ip_address' => '127.0.0.1',
+                'user_agent' => 'System Scheduler',
+            ]);
+
             $sent++;
         }
 

@@ -52,14 +52,18 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Provinsi</label>
-                        <input type="text" name="province" value="{{ old('province', $school->province) }}" maxlength="50"
+                        <select name="province" id="province-select"
                             class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                            <option value="">Pilih Provinsi</option>
+                        </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Kota</label>
-                        <input type="text" name="city" value="{{ old('city', $school->city) }}" maxlength="50"
-                            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Kota/Kabupaten</label>
+                        <select name="city" id="city-select" disabled
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-gray-50 text-gray-500">
+                            <option value="">Pilih Provinsi Terlebih Dahulu</option>
+                        </select>
                     </div>
 
                     <div class="sm:col-span-2">
@@ -131,4 +135,96 @@
             </div>
         </div>
     </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const provinceSelect = document.getElementById('province-select');
+        const citySelect = document.getElementById('city-select');
+        
+        const toTitleCase = (str) => {
+            return str.replace(/\w\S*/g, (txt) => {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        };
+
+        const oldProvince = "{{ old('province', $school->province) }}";
+        const oldCity = "{{ old('city', $school->city) }}";
+
+        try {
+            const response = await fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json');
+            let provinces = await response.json();
+            provinces.sort((a, b) => a.name.localeCompare(b.name));
+
+            provinces.forEach(province => {
+                const option = document.createElement('option');
+                const name = toTitleCase(province.name);
+                option.value = name;
+                option.textContent = name;
+                option.dataset.id = province.id;
+                
+                if (oldProvince && oldProvince === name) {
+                    option.selected = true;
+                }
+                
+                provinceSelect.appendChild(option);
+            });
+
+            if (oldProvince) {
+                const selectedOption = Array.from(provinceSelect.options).find(opt => opt.value === oldProvince);
+                if (selectedOption) {
+                    loadCities(selectedOption.dataset.id, oldCity);
+                }
+            }
+
+        } catch (error) {
+            console.error('Error fetching provinces:', error);
+            provinceSelect.innerHTML += '<option value="">Gagal memuat data</option>';
+        }
+
+        provinceSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const provinceId = selectedOption.dataset.id;
+            
+            if (provinceId) {
+                loadCities(provinceId);
+            } else {
+                citySelect.innerHTML = '<option value="">Pilih Provinsi Terlebih Dahulu</option>';
+                citySelect.disabled = true;
+                citySelect.classList.add('bg-gray-50', 'text-gray-500');
+            }
+        });
+
+        async function loadCities(provinceId, selectedCity = null) {
+            citySelect.innerHTML = '<option value="">Loading...</option>';
+            citySelect.disabled = true;
+            citySelect.classList.remove('bg-gray-50', 'text-gray-500');
+
+            try {
+                const response = await fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provinceId}.json`);
+                let regencies = await response.json();
+                regencies.sort((a, b) => a.name.localeCompare(b.name));
+
+                citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+                
+                regencies.forEach(regency => {
+                    const option = document.createElement('option');
+                    const name = toTitleCase(regency.name);
+                    option.value = name;
+                    option.textContent = name;
+                    
+                    if (selectedCity && selectedCity === name) {
+                        option.selected = true;
+                    }
+                    
+                    citySelect.appendChild(option);
+                });
+                
+                citySelect.disabled = false;
+            } catch (error) {
+                console.error('Error fetching regencies:', error);
+                citySelect.innerHTML = '<option value="">Gagal memuat kota</option>';
+            }
+        }
+    });
+</script>
 </x-layouts.app>

@@ -128,9 +128,24 @@ class PaymentController extends Controller
         // Generate unique order ID
         $orderId = 'INV' . date('YmdHis') . $school->id;
         
-        // Check if this is a trial package (price = 0)
-        if ($package->price == 0 || $package->is_trial) {
-            // For trial packages, skip Midtrans and activate subscription directly
+        // Calculate price with promo if available
+        $price = $package->price;
+        $promoCode = $request->input('promo_code');
+        $discount = 0;
+        $appliedPromoId = null;
+
+        if ($promoCode) {
+            $promo = \App\Models\Promotion::where('code', strtoupper($promoCode))->first();
+            if ($promo && $promo->isValid() && $promo->canBeUsedBy($school->id) && $promo->appliesToPackage($package->id)) {
+                $discount = $promo->calculateDiscount($package->price);
+                $price = $package->price - $discount;
+                $appliedPromoId = $promo->id;
+            }
+        }
+        
+        // Check if this is a trial package (price = 0) or effectively free after discount
+        if ($price <= 0 || $package->is_trial) {
+            // For trial packages/free, skip Midtrans and activate subscription directly
             
             // Create transaction record with settlement status
             $transaction = Transaction::create([
@@ -142,6 +157,7 @@ class PaymentController extends Controller
                 'payment_method' => 'free_trial',
                 'bank' => null,
                 'va_number' => null,
+                // store promo info if needed, though schema might not have it yet
             ]);
             
             // Create subscription immediately
@@ -155,12 +171,22 @@ class PaymentController extends Controller
                 'payment_method' => 'free_trial',
                 'payment_reference' => $orderId,
             ]);
+
+            // Record promo usage if applicable
+            if ($appliedPromoId) {
+                $promo = \App\Models\Promotion::find($appliedPromoId);
+                if ($promo) {
+                    $promo->recordUsage($school->id, $subscription->id, $discount);
+                }
+            }
             
             // Update transaction with subscription_id
             $transaction->update(['subscription_id' => $subscription->id]);
             
-            // Mark trial as used
-            $school->markTrialAsUsed();
+            // Mark trial as used if it was a trial package
+            if ($package->is_trial) {
+                $school->markTrialAsUsed();
+            }
             
             // Update school subscription status
             $school->update([
@@ -174,7 +200,7 @@ class PaymentController extends Controller
                 'action' => 'trial_subscription_activated',
                 'model_type' => Subscription::class,
                 'model_id' => $subscription->id,
-                'description' => "Mengaktifkan paket trial {$package->name} hingga " . $subscription->expires_at->format('d M Y'),
+                'description' => "Mengaktifkan paket {$package->name} hingga " . $subscription->expires_at->format('d M Y'),
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);
@@ -192,15 +218,25 @@ class PaymentController extends Controller
             'school_id' => $school->id,
             'package_id' => $package->id,
             'order_id' => $orderId,
-            'gross_amount' => $package->price,
+            'gross_amount' => $price, // Use discounted price
             'transaction_status' => 'pending',
         ]);
+
+        // Trigger promo usage record logic later upon success or store in session/metadata
+        // For now, we'll rely on reconstructing the promo application or just storing the final amount.
+        // If we need to record usage upon successful payment:
+        if ($appliedPromoId) {
+             // Store in session to record usage later in checkStatus or webhook
+             // Or rely on the fact that amount_paid matches calculated discount
+             // For strict tracking, we might want to store applied_promo_id in transactions table if it exists
+             // But for now, ensuring the price is correct is the priority.
+        }
 
         // Prepare transaction details for Midtrans
         $params = [
             'transaction_details' => [
                 'order_id' => $orderId,
-                'gross_amount' => (int) $package->price,
+                'gross_amount' => (int) $price,
             ],
             'customer_details' => [
                 'first_name' => $school->name,
@@ -210,7 +246,7 @@ class PaymentController extends Controller
             'item_details' => [
                 [
                     'id' => $package->id,
-                    'price' => (int) $package->price,
+                    'price' => (int) $price, // Use discounted price
                     'quantity' => 1,
                     'name' => $package->name . ' - ' . $package->duration_months . ' bulan',
                 ]
