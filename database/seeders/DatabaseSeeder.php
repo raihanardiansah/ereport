@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         // Create Super Admin (no school)
         User::create([
             'name' => 'Super Admin',
-            'email' => 'superadmin@e-report.id',
+            'email' => 'superadmin@ereport.systems',
             'username' => 'superadmin',
             'password' => Hash::make('Password123!'),
             'role' => 'super_admin',

@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 class ContactController extends Controller
 {
     // Contact information constants
-    const SUPPORT_EMAIL = 'support@e-report.id';
+    const SUPPORT_EMAIL = 'support@ereport.systems';
     const SUPPORT_WHATSAPP = '+628990772526';
     const SUPPORT_WHATSAPP_FORMATTED = '628990772526';
 

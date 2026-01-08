@@ -593,15 +593,15 @@
                             </svg>
                         </a>
                         
-                        <a href="mailto:support@e-report.id" class="flex items-center p-5 glass-card rounded-2xl hover:bg-white/5 transition-colors group">
+                        <a href="mailto:support@ereport.systems" class="flex items-center p-5 glass-card rounded-2xl hover:bg-white/5 transition-colors group">
                             <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mr-5">
                                 <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v10a2 2 0 002 2z"/>
                                 </svg>
                             </div>
                             <div>
                                 <p class="text-white font-semibold">Email</p>
-                                <p class="text-white/70">support@e-report.id</p>
+                                <p class="text-white/70">support@ereport.systems</p>
                             </div>
                             <svg class="w-5 h-5 text-gray-500 ml-auto group-hover:text-white group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
