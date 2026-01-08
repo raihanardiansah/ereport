@@ -90,8 +90,8 @@
                 </label>
                 <input type="tel" id="phone" name="phone" value="{{ old('phone') }}"
                     class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent @error('phone') border-danger-500 @enderror"
-                    placeholder="+628123456789">
-                <p class="mt-1 text-sm text-gray-500">Format: +62 diikuti 10-15 digit</p>
+                    placeholder="08123456789">
+                <p class="mt-1 text-sm text-gray-500">Format: 08xxx atau +628xxx</p>
                 @error('phone')
                     <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                 @enderror

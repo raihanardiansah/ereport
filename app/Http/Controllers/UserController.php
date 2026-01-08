@@ -94,7 +94,7 @@ class UserController extends Controller
             'phone' => [
                 'nullable',
                 'string',
-                'regex:/^\+62[0-9]{10,15}$/', // +62 format, 10-15 digits
+                'regex:/^(\+62|62|0)?8[0-9]{8,13}$/',
             ],
         ], [
             'name.regex' => 'Nama hanya boleh huruf dan spasi.',
@@ -103,7 +103,7 @@ class UserController extends Controller
             'username.max' => 'Username maksimal 30 karakter.',
             'nip_nisn.regex' => 'NIP/NISN hanya boleh angka.',
             'nip_nisn.max' => 'NIP/NISN maksimal 20 digit.',
-            'phone.regex' => 'Format nomor HP: +62 diikuti 10-15 digit.',
+            'phone.regex' => 'Format nomor HP tidak valid. Contoh: 08123456789 atau +628123456789',
             'password.mixed' => 'Password harus ada huruf besar dan kecil.',
             'password.numbers' => 'Password harus ada angka.',
             'password.symbols' => 'Password harus ada simbol.',
@@ -117,7 +117,7 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'nip_nisn' => $validated['nip_nisn'] ?? null,
-            'phone' => $validated['phone'] ?? null,
+            'phone' => $this->normalizePhone($validated['phone'] ?? null),
             'email_verified_at' => now(),
         ]);
 
@@ -190,13 +190,13 @@ class UserController extends Controller
             'phone' => [
                 'nullable',
                 'string',
-                'regex:/^\+62[0-9]{10,15}$/',
+                'regex:/^(\+62|62|0)?8[0-9]{8,13}$/',
             ],
         ], [
             'name.regex' => 'Nama hanya boleh huruf dan spasi.',
             'username.regex' => 'Username hanya boleh huruf kecil dan angka.',
             'nip_nisn.regex' => 'NIP/NISN hanya boleh angka.',
-            'phone.regex' => 'Format nomor HP: +62 diikuti 10-15 digit.',
+            'phone.regex' => 'Format nomor HP tidak valid. Contoh: 08123456789 atau +628123456789',
         ]);
 
         $user->name = $validated['name'];
@@ -204,7 +204,7 @@ class UserController extends Controller
         $user->username = $validated['username'];
         $user->role = $validated['role'];
         $user->nip_nisn = $validated['nip_nisn'] ?? null;
-        $user->phone = $validated['phone'] ?? null;
+        $user->phone = $this->normalizePhone($validated['phone'] ?? null);
 
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
@@ -263,8 +263,8 @@ class UserController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, $columns);
             // Example rows
-            fputcsv($file, ['Budi Santoso', 'budi@email.com', 'budisantoso01', 'siswa', '0012345678', '+6281234567890']);
-            fputcsv($file, ['Rina Kusuma', 'rina@email.com', 'rinakusuma01', 'guru', '198501012010', '+6289876543210']);
+            fputcsv($file, ['Budi Santoso', 'budi@email.com', 'budisantoso01', 'siswa', '0012345678', '081234567890']);
+            fputcsv($file, ['Rina Kusuma', 'rina@email.com', 'rinakusuma01', 'guru', '198501012010', '089876543210']);
             fclose($file);
         };
 
@@ -385,10 +385,12 @@ class UserController extends Controller
                 $rowErrors[] = 'NIP/NISN hanya boleh angka';
             }
 
-            // Validate phone if provided
+            // Validate and normalize phone if provided
             $phone = $data['telepon'] ?? '';
-            if (!empty($phone) && !preg_match('/^\+62[0-9]{10,15}$/', $phone)) {
-                $rowErrors[] = 'Format telepon: +62 diikuti 10-15 digit';
+            if (!empty($phone) && !preg_match('/^(\+62|62|0)?8[0-9]{8,13}$/', $phone)) {
+                $rowErrors[] = 'Format telepon tidak valid. Contoh: 08123456789';
+            } else {
+                $phone = $this->normalizePhone($phone);
             }
 
             // Generate password from NIP/NISN
@@ -428,5 +430,29 @@ class UserController extends Controller
             'import_success' => $successCount,
             'import_errors' => $errors,
         ]);
+    }
+
+    /**
+     * Convert phone number from local format (08xxx, 8xxx, 628xxx) to international format (+62xxx).
+     */
+    protected function normalizePhone(?string $phone): ?string
+    {
+        if (empty($phone)) {
+            return null;
+        }
+
+        $phone = preg_replace('/[^0-9+]/', '', $phone);
+
+        if (preg_match('/^0(\d+)$/', $phone, $matches)) {
+            return '+62' . $matches[1];
+        } elseif (preg_match('/^62(\d+)$/', $phone, $matches)) {
+            return '+62' . $matches[1];
+        } elseif (preg_match('/^\+62(\d+)$/', $phone, $matches)) {
+            return '+62' . $matches[1];
+        } elseif (preg_match('/^8(\d+)$/', $phone, $matches)) {
+            return '+628' . $matches[1];
+        }
+
+        return $phone;
     }
 }

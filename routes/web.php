@@ -29,6 +29,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [\App\Http\Controllers\SchoolController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [\App\Http\Controllers\SchoolController::class, 'register'])->name('register.store');
+    
+    // Password Reset Routes
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
 

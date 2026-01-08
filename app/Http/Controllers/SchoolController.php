@@ -51,7 +51,7 @@ class SchoolController extends Controller
             'phone' => [
                 'nullable',
                 'string',
-                'regex:/^\+62[0-9]{10,15}$/',
+                'regex:/^(\+62|62|0)?8[0-9]{8,13}$/',
             ],
             'address' => [
                 'nullable',
@@ -104,7 +104,7 @@ class SchoolController extends Controller
             'school_email.unique' => 'Email sekolah sudah terdaftar.',
             'npsn.regex' => 'NPSN hanya boleh angka.',
             'npsn.unique' => 'NPSN sudah terdaftar.',
-            'phone.regex' => 'Format telepon: +62 diikuti 10-15 digit.',
+            'phone.regex' => 'Format telepon tidak valid. Contoh: 08123456789 atau +628123456789',
             'admin_name.regex' => 'Nama hanya boleh huruf dan spasi.',
             'admin_username.regex' => 'Username hanya boleh huruf kecil dan angka.',
             'admin_username.min' => 'Username minimal 8 karakter.',
@@ -155,7 +155,7 @@ class SchoolController extends Controller
                 'name' => $validated['school_name'],
                 'email' => $validated['school_email'],
                 'npsn' => $validated['npsn'] ?? null,
-                'phone' => $validated['phone'] ?? null,
+                'phone' => $this->normalizePhone($validated['phone'] ?? null),
                 'address' => $validated['address'] ?? null,
                 'province' => $validated['province'] ?? null,
                 'city' => $validated['city'] ?? null,
@@ -223,15 +223,53 @@ class SchoolController extends Controller
             'name' => 'required|string|max:100',
             'email' => ['required', 'email', Rule::unique('schools')->ignore($school->id)],
             'npsn' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/', Rule::unique('schools')->ignore($school->id)],
-            'phone' => ['nullable', 'string', 'regex:/^\+62[0-9]{10,15}$/'],
+            'phone' => ['nullable', 'string', 'regex:/^(\+62|62|0)?8[0-9]{8,13}$/'],
             'address' => 'nullable|string|max:500',
             'province' => 'nullable|string|max:50',
             'city' => 'nullable|string|max:50',
             'website' => 'nullable|url|max:255',
+        ], [
+            'phone.regex' => 'Format telepon tidak valid. Contoh: 08123456789 atau +628123456789',
         ]);
+
+        // Normalize phone number before saving
+        if (isset($validated['phone'])) {
+            $validated['phone'] = $this->normalizePhone($validated['phone']);
+        }
 
         $school->update($validated);
 
         return back()->with('success', 'Profil sekolah berhasil diperbarui.');
+    }
+
+    /**
+     * Convert phone number from local format (08xxx, 8xxx, 628xxx) to international format (+62xxx).
+     */
+    protected function normalizePhone(?string $phone): ?string
+    {
+        if (empty($phone)) {
+            return null;
+        }
+
+        // Remove all non-digit characters except +
+        $phone = preg_replace('/[^0-9+]/', '', $phone);
+
+        // Convert various formats to +62
+        if (preg_match('/^0(\d+)$/', $phone, $matches)) {
+            // 08xxx -> +62xxx
+            return '+62' . $matches[1];
+        } elseif (preg_match('/^62(\d+)$/', $phone, $matches)) {
+            // 628xxx -> +628xxx
+            return '+62' . $matches[1];
+        } elseif (preg_match('/^\+62(\d+)$/', $phone, $matches)) {
+            // Already +62 format
+            return '+62' . $matches[1];
+        } elseif (preg_match('/^8(\d+)$/', $phone, $matches)) {
+            // 8xxx -> +628xxx
+            return '+628' . $matches[1];
+        }
+
+        // Return original if no pattern matches
+        return $phone;
     }
 }

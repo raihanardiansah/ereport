@@ -48,8 +48,10 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Telepon</label>
                         <input type="tel" name="phone" value="{{ old('phone') }}"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                            placeholder="+6221123456">
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 @error('phone') border-danger-500 @enderror"
+                            placeholder="08123456789">
+                        <p class="mt-1 text-xs text-gray-500">Format: 08xxx atau +628xxx</p>
+                        @error('phone')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Kota</label>

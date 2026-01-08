@@ -5,8 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rules\Password;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -149,5 +154,184 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/')->with('success', 'Anda telah logout.');
+    }
+
+    /**
+     * Show forgot password form.
+     */
+    public function showForgotPassword()
+    {
+        return view('auth.forgot-password');
+    }
+
+    /**
+     * Send password reset link.
+     */
+    public function sendResetLink(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'g-recaptcha-response' => 'required',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'g-recaptcha-response.required' => 'Silakan centang reCAPTCHA.',
+        ]);
+
+        // Verify reCAPTCHA
+        try {
+            $recaptcha = new \ReCaptcha\ReCaptcha(config('services.recaptcha.secret_key'));
+            $resp = $recaptcha->verify($request->input('g-recaptcha-response'), $request->ip());
+            
+            if (!$resp->isSuccess() && config('app.env') !== 'local') {
+                return back()->withErrors(['g-recaptcha-response' => 'Verifikasi reCAPTCHA gagal.'])->withInput();
+            }
+        } catch (\Exception $e) {
+            \Log::error('reCAPTCHA error: ' . $e->getMessage());
+            if (config('app.env') !== 'local') {
+                return back()->withErrors(['g-recaptcha-response' => 'Tidak dapat memverifikasi reCAPTCHA.'])->withInput();
+            }
+        }
+
+        // Find user by email
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'Email tidak terdaftar dalam sistem.'])->withInput();
+        }
+
+        // Generate token
+        $token = Str::random(64);
+
+        // Delete existing tokens for this email
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        // Insert new token
+        DB::table('password_reset_tokens')->insert([
+            'email' => $request->email,
+            'token' => Hash::make($token),
+            'created_at' => Carbon::now(),
+        ]);
+
+        // Build reset URL
+        $resetUrl = url('/reset-password/' . $token . '?email=' . urlencode($request->email));
+
+        // Send email
+        try {
+            Mail::send('emails.password-reset', [
+                'user' => $user,
+                'resetUrl' => $resetUrl,
+            ], function ($message) use ($user) {
+                $message->to($user->email);
+                $message->subject('Reset Password - e-Report');
+            });
+
+            return back()->with('success', 'Link reset password telah dikirim ke email Anda. Silakan cek inbox atau folder spam.');
+        } catch (\Exception $e) {
+            \Log::error('Failed to send password reset email: ' . $e->getMessage());
+            return back()->withErrors(['email' => 'Gagal mengirim email. Silakan coba lagi nanti.'])->withInput();
+        }
+    }
+
+    /**
+     * Show reset password form.
+     */
+    public function showResetForm(Request $request, $token)
+    {
+        $email = $request->query('email');
+
+        if (!$email) {
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'Link reset password tidak valid.']);
+        }
+
+        // Verify token exists and not expired
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->first();
+
+        if (!$record) {
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'Link reset password tidak valid atau sudah kadaluarsa.']);
+        }
+
+        // Check if token is expired (60 minutes)
+        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            DB::table('password_reset_tokens')->where('email', $email)->delete();
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'Link reset password sudah kadaluarsa. Silakan minta link baru.']);
+        }
+
+        // Verify token matches
+        if (!Hash::check($token, $record->token)) {
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'Link reset password tidak valid.']);
+        }
+
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $email,
+        ]);
+    }
+
+    /**
+     * Reset password.
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => [
+                'required',
+                'confirmed',
+                Password::min(8)
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+            ],
+        ], [
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.mixed' => 'Password harus ada huruf besar dan kecil.',
+            'password.numbers' => 'Password harus ada angka.',
+            'password.symbols' => 'Password harus ada simbol.',
+        ]);
+
+        // Verify token
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$record) {
+            return back()->withErrors(['email' => 'Link reset password tidak valid.']);
+        }
+
+        // Check token expiry
+        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            return redirect()->route('password.request')
+                ->withErrors(['email' => 'Link reset password sudah kadaluarsa.']);
+        }
+
+        // Verify token matches
+        if (!Hash::check($request->token, $record->token)) {
+            return back()->withErrors(['email' => 'Link reset password tidak valid.']);
+        }
+
+        // Find user and update password
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'User tidak ditemukan.']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Delete used token
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return redirect()->route('login')
+            ->with('success', 'Password berhasil direset! Silakan login dengan password baru Anda.');
     }
 }

@@ -5,7 +5,34 @@
         <p class="text-gray-500 mt-1 text-sm">Selamat datang! Silakan login dengan akun Anda.</p>
     </div>
 
-    <!-- Login Form -->
+    {{-- Success Message --}}
+    @if(session('success'))
+        <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm flex items-start gap-2">
+            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    {{-- Global Error Alert --}}
+    @if($errors->any())
+        <div class="mb-4 p-3 bg-danger-50 border border-danger-200 text-danger-700 rounded-lg text-sm">
+            <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                    <p class="font-medium">Oops! Ada kesalahan:</p>
+                    <ul class="mt-1 list-disc list-inside space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+    @endif
     <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
 
@@ -94,7 +121,7 @@
                 >
                 <span class="ml-2 text-gray-600">Ingat Saya</span>
             </label>
-            <a href="#" onclick="event.preventDefault(); showToast('Fitur reset password sedang dalam pengembangan. Silakan hubungi administrator untuk bantuan reset password.', 'info'); return false;" class="text-[#00B4D8] hover:text-[#155E75] font-medium">
+            <a href="{{ route('password.request') }}" class="text-[#00B4D8] hover:text-[#155E75] font-medium">
                 Lupa Password?
             </a>
         </div>

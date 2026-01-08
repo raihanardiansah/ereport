@@ -37,7 +37,8 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Telepon</label>
                         <input type="tel" name="phone" value="{{ old('phone', $school->phone) }}"
                             class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent @error('phone') border-danger-500 @enderror"
-                            placeholder="+6221123456">
+                            placeholder="08123456789">
+                        <p class="mt-1 text-xs text-gray-500">Format: 08xxx atau +628xxx</p>
                         @error('phone')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
                     </div>
 

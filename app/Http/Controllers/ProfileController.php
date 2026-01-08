@@ -27,15 +27,15 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z\s]+$/'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'phone' => ['nullable', 'string', 'regex:/^\+62[0-9]{10,15}$/'],
+            'phone' => ['nullable', 'string', 'regex:/^(\+62|62|0)?8[0-9]{8,13}$/'],
         ], [
             'name.regex' => 'Nama hanya boleh huruf dan spasi.',
-            'phone.regex' => 'Format nomor HP: +62 diikuti 10-15 digit.',
+            'phone.regex' => 'Format nomor HP tidak valid. Contoh: 08123456789 atau +628123456789',
         ]);
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->phone = $validated['phone'] ?? null;
+        $user->phone = $this->normalizePhone($validated['phone'] ?? null);
         $user->save();
 
         return back()->with('success', 'Profil berhasil diperbarui.');
@@ -101,5 +101,29 @@ class ProfileController extends Controller
         $user->save();
 
         return back()->with('success', 'Preferensi email berhasil disimpan.');
+    }
+
+    /**
+     * Convert phone number from local format (08xxx, 8xxx, 628xxx) to international format (+62xxx).
+     */
+    protected function normalizePhone(?string $phone): ?string
+    {
+        if (empty($phone)) {
+            return null;
+        }
+
+        $phone = preg_replace('/[^0-9+]/', '', $phone);
+
+        if (preg_match('/^0(\d+)$/', $phone, $matches)) {
+            return '+62' . $matches[1];
+        } elseif (preg_match('/^62(\d+)$/', $phone, $matches)) {
+            return '+62' . $matches[1];
+        } elseif (preg_match('/^\+62(\d+)$/', $phone, $matches)) {
+            return '+62' . $matches[1];
+        } elseif (preg_match('/^8(\d+)$/', $phone, $matches)) {
+            return '+628' . $matches[1];
+        }
+
+        return $phone;
     }
 }
