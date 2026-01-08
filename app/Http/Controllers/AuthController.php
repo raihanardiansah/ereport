@@ -81,7 +81,7 @@ class AuthController extends Controller
 
         if (filter_var($loginValue, FILTER_VALIDATE_EMAIL)) {
             $loginType = 'email';
-        } elseif (preg_match('/^[0-9+-\s]+$/', $loginValue) && strlen(preg_replace('/[^0-9]/', '', $loginValue)) >= 10) {
+        } elseif (preg_match('/^[0-9+\s\-]+$/', $loginValue) && strlen(preg_replace('/[^0-9]/', '', $loginValue)) >= 10) {
             $loginType = 'phone';
             // Optional: Normalize phone number here if needed (e.g. remove spaces/dashes)
         }

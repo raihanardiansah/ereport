@@ -161,6 +161,7 @@ class SchoolController extends Controller
                 'city' => $validated['city'] ?? null,
                 'subscription_status' => 'trial',
                 'trial_ends_at' => $trialEndsAt,
+                'has_used_trial' => true,
             ]);
 
             // Create trial subscription record

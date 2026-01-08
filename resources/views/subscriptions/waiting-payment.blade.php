@@ -307,7 +307,6 @@
         // Auto-refresh VA number if not available (Only for VA)
         @if(!$transaction->va_number && !in_array($transaction->payment_method, ['qris', 'gopay']))
         setTimeout(() => {
-            console.log('Reloading to check for VA number...');
             location.reload();
         }, 5000);
         @endif
@@ -323,7 +322,6 @@
 
         // Cancel Transaction
         async function cancelTransaction() {
-            console.log('=== Cancel Transaction Started ===');
             const btn = document.getElementById('cancel-confirm-btn');
             const btnText = document.getElementById('cancel-btn-text');
             const btnLoading = document.getElementById('cancel-btn-loading');
@@ -334,7 +332,6 @@
 
             try {
                 const url = '/subscriptions/cancel/{{ $transaction->order_id }}';
-                console.log('Canceling transaction:', url);
                 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -345,9 +342,7 @@
                     }
                 });
 
-                console.log('Response status:', response.status);
                 const data = await response.json();
-                console.log('Response data:', data);
 
                 if (data.success) {
                     showToast('Transaksi berhasil dibatalkan', 'success');
@@ -404,9 +399,7 @@
 
         // Copy VA Number
         function copyVA() {
-            console.log('=== Copy VA Function Called ===');
             const vaElement = document.getElementById('va-number');
-            console.log('VA Element:', vaElement);
             
             if (!vaElement) {
                 console.error('VA number element not found!');
@@ -415,13 +408,10 @@
             }
             
             const vaNumber = vaElement.textContent.trim();
-            console.log('VA Number to copy:', vaNumber);
             
             // Try modern clipboard API first
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                console.log('Using modern clipboard API...');
                 navigator.clipboard.writeText(vaNumber).then(() => {
-                    console.log('✓ Copy successful via clipboard API');
                     showToast('✓ Nomor VA berhasil disalin!', 'success');
                 }).catch(err => {
                     console.error('Clipboard API failed:', err);
@@ -429,7 +419,6 @@
                     copyToClipboardFallback(vaNumber);
                 });
             } else {
-                console.log('Clipboard API not available, using fallback...');
                 // Fallback for older browsers
                 copyToClipboardFallback(vaNumber);
             }
@@ -437,7 +426,6 @@
         
         // Fallback copy method
         function copyToClipboardFallback(text) {
-            console.log('Using fallback copy method...');
             const textArea = document.createElement('textarea');
             textArea.value = text;
             textArea.style.position = 'fixed';
@@ -448,7 +436,6 @@
             textArea.select();
             try {
                 const successful = document.execCommand('copy');
-                console.log('execCommand copy result:', successful);
                 if (successful) {
                     showToast('✓ Nomor VA berhasil disalin!', 'success');
                 } else {
@@ -470,7 +457,6 @@
             }
             
             const url = qrUrlInput.value;
-            console.log('Copying QR URL:', url);
 
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(url).then(() => {
@@ -486,7 +472,6 @@
 
         // Check payment status
         async function checkPaymentStatus() {
-            console.log('=== Check Payment Status Started ===');
             const btn = document.getElementById('check-status-btn');
             const btnText = document.getElementById('check-btn-text');
             const btnLoading = document.getElementById('check-btn-loading');
@@ -499,7 +484,6 @@
 
             try {
                 const url = '/subscriptions/check-status/{{ $transaction->order_id }}';
-                console.log('Fetching URL:', url);
                 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -509,12 +493,9 @@
                     }
                 });
 
-                console.log('Response status:', response.status);
                 const data = await response.json();
-                console.log('Response data:', data);
 
                 if (data.success) {
-                    console.log('Success! Payment status:', data.status, 'Is success:', data.is_success);
                     if (data.is_success) {
                         // Show success state immediately
                         showSuccessState();
@@ -523,8 +504,6 @@
                         document.getElementById('waiting-card').classList.remove('hidden');
                         const paymentContent = document.getElementById('payment-content');
                         if (paymentContent) paymentContent.classList.remove('hidden');
-
-                        console.log('Payment not successful yet, status:', data.status);
                         // Only show alert if explicit status change or error
                         if (data.status !== 'pending') {
                             statusAlert.className = 'mt-4 p-4 rounded-xl bg-yellow-50 border border-yellow-200';
@@ -552,7 +531,6 @@
 
         // Show success state
         function showSuccessState() {
-            console.log('Showing success state...');
             
             // Hide waiting card and payment details
             document.getElementById('waiting-card').classList.add('hidden');
@@ -584,7 +562,6 @@
                 
                 if (countdown <= 0) {
                     clearInterval(countdownInterval);
-                    console.log('Redirecting to subscriptions...');
                     window.location.href = '{{ route("subscriptions.index") }}';
                 }
             }, 1000);
@@ -592,7 +569,6 @@
 
         // Auto-check status on page load
         window.addEventListener('DOMContentLoaded', () => {
-            console.log('Page loaded, checking payment status...');
             checkPaymentStatus();
         });
 

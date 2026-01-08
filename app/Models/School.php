@@ -91,8 +91,19 @@ class School extends Model
      */
     public function isEligibleForTrial(): bool
     {
-        // Already used trial
+        // Already used trial flag
         if ($this->has_used_trial) {
+            return false;
+        }
+
+        // Check if any trial subscription exists in history (fallback for existing data)
+        $hasTrialHistory = $this->subscriptions()
+            ->where('payment_method', 'trial')
+            ->exists();
+
+        if ($hasTrialHistory) {
+            // Self-heal: mark as used
+            $this->markTrialAsUsed();
             return false;
         }
 

@@ -49,13 +49,15 @@
                         <!-- Progress Bar -->
                         <div class="mb-4">
                             <div class="flex justify-between text-sm mb-1">
-                                <span class="text-gray-500 dark:text-gray-400">Masa aktif</span>
+                                <span class="text-gray-500 dark:text-gray-400">
+                                    {{ $currentSubscription->payment_method === 'trial' ? 'Sisa Masa Percobaan' : 'Masa aktif' }}
+                                </span>
                                 <span class="font-medium {{ $subscriptionInfo['is_expiring_soon'] ? 'text-amber-600' : 'text-gray-700 dark:text-gray-300' }}">
                                     {{ $subscriptionInfo['days_remaining'] }} hari tersisa
                                 </span>
                             </div>
                             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                                <div class="h-2.5 rounded-full {{ $subscriptionInfo['is_expiring_soon'] ? 'bg-amber-500' : 'bg-indigo-600' }}" 
+                                <div class="h-2.5 rounded-full {{ $currentSubscription->payment_method === 'trial' ? 'bg-orange-500' : ($subscriptionInfo['is_expiring_soon'] ? 'bg-amber-500' : 'bg-indigo-600') }}" 
                                      style="width: {{ $subscriptionInfo['progress_percent'] }}%"></div>
                             </div>
                             <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -431,7 +433,6 @@
 
     // Unsubscribe
     async function unsubscribe() {
-        console.log('=== Unsubscribe Started ===');
         const btn = document.getElementById('unsubscribe-confirm-btn');
         const btnText = document.getElementById('unsubscribe-btn-text');
         const btnLoading = document.getElementById('unsubscribe-btn-loading');
@@ -470,9 +471,7 @@
                 })
             });
 
-            console.log('Response status:', response.status);
             const data = await response.json();
-            console.log('Response data:', data);
 
             if (data.success) {
                 showToast('Langganan berhasil diberhentikan', 'success');
