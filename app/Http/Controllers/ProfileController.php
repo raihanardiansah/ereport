@@ -126,4 +126,122 @@ class ProfileController extends Controller
 
         return $phone;
     }
+
+    /**
+     * Show active sessions for the user.
+     */
+    public function sessions()
+    {
+        $sessions = \DB::table('sessions')
+            ->where('user_id', auth()->id())
+            ->orderByDesc('last_activity')
+            ->get()
+            ->map(function ($session) {
+                return (object) [
+                    'id' => $session->id,
+                    'ip_address' => $session->ip_address,
+                    'user_agent' => $session->user_agent,
+                    'last_activity' => \Carbon\Carbon::createFromTimestamp($session->last_activity),
+                    'is_current' => $session->id === session()->getId(),
+                    'device' => $this->parseUserAgent($session->user_agent),
+                ];
+            });
+
+        return view('profile.sessions', compact('sessions'));
+    }
+
+    /**
+     * Destroy a specific session.
+     */
+    public function destroySession(Request $request, string $sessionId)
+    {
+        $session = \DB::table('sessions')
+            ->where('id', $sessionId)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$session) {
+            return back()->with('error', 'Sesi tidak ditemukan.');
+        }
+
+        if ($sessionId === session()->getId()) {
+            return back()->with('error', 'Tidak bisa menghapus sesi yang sedang aktif.');
+        }
+
+        \DB::table('sessions')->where('id', $sessionId)->delete();
+
+        return back()->with('success', 'Sesi berhasil dihapus.');
+    }
+
+    /**
+     * Destroy all other sessions except the current one.
+     */
+    public function destroyOtherSessions(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'current_password'],
+        ], [
+            'password.required' => 'Password wajib diisi.',
+            'password.current_password' => 'Password tidak sesuai.',
+        ]);
+
+        \DB::table('sessions')
+            ->where('user_id', auth()->id())
+            ->where('id', '!=', session()->getId())
+            ->delete();
+
+        return back()->with('success', 'Semua sesi lain berhasil dihapus.');
+    }
+
+    /**
+     * Parse user agent to get device info.
+     */
+    protected function parseUserAgent(?string $userAgent): array
+    {
+        if (!$userAgent) {
+            return ['browser' => 'Unknown', 'platform' => 'Unknown', 'device_type' => 'unknown'];
+        }
+
+        // Detect browser
+        $browser = 'Unknown';
+        if (preg_match('/Chrome\/[\d.]+/i', $userAgent) && !preg_match('/Edg/i', $userAgent)) {
+            $browser = 'Chrome';
+        } elseif (preg_match('/Firefox\/[\d.]+/i', $userAgent)) {
+            $browser = 'Firefox';
+        } elseif (preg_match('/Safari\/[\d.]+/i', $userAgent) && !preg_match('/Chrome/i', $userAgent)) {
+            $browser = 'Safari';
+        } elseif (preg_match('/Edg\/[\d.]+/i', $userAgent)) {
+            $browser = 'Edge';
+        } elseif (preg_match('/MSIE|Trident/i', $userAgent)) {
+            $browser = 'Internet Explorer';
+        }
+
+        // Detect platform
+        $platform = 'Unknown';
+        if (preg_match('/Windows/i', $userAgent)) {
+            $platform = 'Windows';
+        } elseif (preg_match('/Macintosh|Mac OS/i', $userAgent)) {
+            $platform = 'macOS';
+        } elseif (preg_match('/Linux/i', $userAgent) && !preg_match('/Android/i', $userAgent)) {
+            $platform = 'Linux';
+        } elseif (preg_match('/Android/i', $userAgent)) {
+            $platform = 'Android';
+        } elseif (preg_match('/iPhone|iPad|iPod/i', $userAgent)) {
+            $platform = 'iOS';
+        }
+
+        // Detect device type
+        $deviceType = 'desktop';
+        if (preg_match('/Mobile|Android|iPhone|iPod/i', $userAgent)) {
+            $deviceType = 'mobile';
+        } elseif (preg_match('/iPad|Tablet/i', $userAgent)) {
+            $deviceType = 'tablet';
+        }
+
+        return [
+            'browser' => $browser,
+            'platform' => $platform,
+            'device_type' => $deviceType,
+        ];
+    }
 }

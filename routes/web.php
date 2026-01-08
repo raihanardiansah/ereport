@@ -54,6 +54,11 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::get('/', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
         Route::put('/', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
         Route::put('/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password');
+        
+        // Session management
+        Route::get('/sessions', [\App\Http\Controllers\ProfileController::class, 'sessions'])->name('profile.sessions');
+        Route::delete('/sessions/{session}', [\App\Http\Controllers\ProfileController::class, 'destroySession'])->name('profile.sessions.destroy');
+        Route::delete('/sessions', [\App\Http\Controllers\ProfileController::class, 'destroyOtherSessions'])->name('profile.sessions.destroy-others');
     });
     Route::get('/settings', [\App\Http\Controllers\ProfileController::class, 'settings'])->name('settings');
     Route::put('/settings', [\App\Http\Controllers\ProfileController::class, 'updateSettings'])->name('settings.update');

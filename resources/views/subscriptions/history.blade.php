@@ -6,7 +6,6 @@
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         @if($transactions->count() > 0)
-        @if($transactions->count() > 0)
         <!-- Desktop View -->
         <div class="hidden md:block overflow-x-auto">
             <table class="w-full">
