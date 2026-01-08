@@ -28,13 +28,47 @@
                 @if($report->attachment_path)
                 <div class="mt-6 pt-6 border-t border-gray-100">
                     <h4 class="text-sm font-medium text-gray-700 mb-3">Lampiran</h4>
-                    <a href="{{ Storage::url($report->attachment_path) }}" target="_blank" 
-                       class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-700 transition-colors">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                    @php
+                        $extension = strtolower(pathinfo($report->attachment_path, PATHINFO_EXTENSION));
+                        $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                        $attachmentUrl = Storage::url($report->attachment_path);
+                    @endphp
+                    
+                    @if($isImage)
+                    {{-- Image Preview with Lightbox --}}
+                    <div class="space-y-3">
+                        <div class="relative group cursor-pointer" onclick="openImageModal('{{ $attachmentUrl }}')">
+                            <img src="{{ $attachmentUrl }}" 
+                                 alt="Lampiran Laporan" 
+                                 class="max-w-full max-h-64 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow object-contain"
+                                 onerror="this.parentElement.innerHTML='<div class=\'flex items-center justify-center h-32 bg-gray-100 rounded-lg border border-gray-200\'><p class=\'text-sm text-red-500\'>Gambar tidak dapat dimuat. Pastikan storage link sudah dibuat.</p></div>'">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <a href="{{ $attachmentUrl }}" target="_blank" download
+                           class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-700 transition-colors">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Download Gambar
+                        </a>
+                    </div>
+                    @else
+                    {{-- PDF or Other File --}}
+                    <a href="{{ $attachmentUrl }}" target="_blank" 
+                       class="inline-flex items-center px-4 py-3 bg-red-50 hover:bg-red-100 border border-red-100 rounded-lg text-sm text-red-700 transition-colors">
+                        <svg class="w-6 h-6 mr-3 text-red-500" fill="currentColor" viewBox="0 0 384 512">
+                            <path d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64z"/>
                         </svg>
-                        Lihat Lampiran
+                        <div>
+                            <p class="font-medium">Lihat / Download PDF</p>
+                            <p class="text-xs text-red-500">Klik untuk membuka file PDF</p>
+                        </div>
                     </a>
+                    @endif
                 </div>
                 @endif
             </div>
@@ -411,5 +445,41 @@
             @endif
         </div>
     </div>
+
+    {{-- Image Lightbox Modal --}}
+    <div id="imageLightbox" class="fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center z-[9999]" onclick="closeImageModal(event)">
+        <button onclick="closeImageModal(event)" class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+        <img id="lightboxImage" src="" alt="Lampiran" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+    </div>
+
+    <script>
+        function openImageModal(url) {
+            const modal = document.getElementById('imageLightbox');
+            const img = document.getElementById('lightboxImage');
+            img.src = url;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeImageModal(event) {
+            if (event) event.stopPropagation();
+            const modal = document.getElementById('imageLightbox');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+    </script>
 </x-layouts.app>
 

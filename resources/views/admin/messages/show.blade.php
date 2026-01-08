@@ -281,4 +281,108 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function() {
+    const messageId = {{ $message->id }};
+    let lastReplyCount = {{ $message->replies->count() }};
+    let pollInterval = null;
+    
+    // Container for conversation thread
+    const threadContainer = document.querySelector('.custom-scrollbar');
+    
+    function renderReplyBubble(reply) {
+        const isAdmin = reply.is_admin;
+        const alignClass = isAdmin ? 'justify-start' : 'justify-end';
+        const bubbleClass = isAdmin 
+            ? 'bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800' 
+            : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600';
+        const nameClass = isAdmin ? 'text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300';
+        
+        return `
+            <div class="flex ${alignClass} animate-fadeIn">
+                <div class="${bubbleClass} rounded-xl p-4 max-w-[90%] shadow-sm">
+                    <div class="flex items-center gap-2 mb-2 ${isAdmin ? 'justify-start' : 'justify-end'}">
+                        <span class="text-xs font-bold ${nameClass}">${reply.sender_name}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">${reply.created_at}</span>
+                    </div>
+                    <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">${reply.message}</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    async function checkForNewReplies() {
+        try {
+            const response = await fetch(`/admin/messages/${messageId}/replies`);
+            const data = await response.json();
+            
+            if (data.success && data.replies_count > lastReplyCount) {
+                // New replies detected - refresh the thread container
+                const newReplies = data.replies.slice(lastReplyCount);
+                
+                if (threadContainer) {
+                    newReplies.forEach(reply => {
+                        threadContainer.insertAdjacentHTML('beforeend', renderReplyBubble(reply));
+                    });
+                    
+                    // Scroll to bottom
+                    threadContainer.scrollTop = threadContainer.scrollHeight;
+                    
+                    // Show notification
+                    showNewReplyNotification(newReplies.length);
+                }
+                
+                lastReplyCount = data.replies_count;
+            }
+        } catch (e) {
+            console.error('Failed to check for new replies', e);
+        }
+    }
+    
+    function showNewReplyNotification(count) {
+        // Create a toast notification
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce';
+        toast.innerHTML = `
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+                <span>${count} balasan baru!</span>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+    
+    // Start polling every 5 seconds
+    pollInterval = setInterval(checkForNewReplies, 5000);
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+        }
+    });
+    
+    // Add fadeIn animation style
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    `;
+    document.head.appendChild(style);
+})();
+</script>
+@endpush
 @endsection

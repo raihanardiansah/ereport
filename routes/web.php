@@ -203,6 +203,7 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::post('/messages/{message}/read', [\App\Http\Controllers\ContactController::class, 'markAsRead'])->name('admin.messages.read');
         Route::post('/messages/{message}/reply', [\App\Http\Controllers\ContactController::class, 'reply'])->name('admin.messages.reply');
         Route::put('/messages/{message}/status', [\App\Http\Controllers\ContactController::class, 'updateStatus'])->name('admin.messages.status');
+        Route::get('/messages/{message}/replies', [\App\Http\Controllers\ContactController::class, 'getAdminReplies'])->name('admin.messages.replies');
 
         // Package & Promotion Management
         Route::get('/packages', [\App\Http\Controllers\Admin\PackageController::class, 'index'])->name('admin.packages');

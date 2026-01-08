@@ -81,6 +81,9 @@
     const chatWidget = {
         isOpen: false,
         isLoading: false,
+        currentThreadId: null,
+        pollInterval: null,
+        threadPollInterval: null,
         
         toggle() {
             const window = document.getElementById('chat-window');
@@ -88,14 +91,112 @@
                 window.classList.remove('hidden');
                 this.isOpen = true;
                 this.loadMessages();
+                this.startPolling();
             } else {
                 window.classList.add('hidden');
                 this.isOpen = false;
+                this.stopPolling();
             }
         },
 
-        async loadMessages() {
-            this.setLoading(true);
+        startPolling() {
+            // Poll message list every 5 seconds
+            this.pollInterval = setInterval(() => {
+                if (this.isOpen && !this.currentThreadId) {
+                    this.loadMessages(true); // silent refresh
+                }
+            }, 5000);
+        },
+
+        stopPolling() {
+            if (this.pollInterval) {
+                clearInterval(this.pollInterval);
+                this.pollInterval = null;
+            }
+            this.stopThreadPolling();
+        },
+
+        startThreadPolling(threadId) {
+            this.stopThreadPolling();
+            // Poll current thread every 3 seconds for real-time replies
+            this.threadPollInterval = setInterval(() => {
+                if (this.isOpen && this.currentThreadId === threadId) {
+                    this.refreshThread(threadId);
+                }
+            }, 3000);
+        },
+
+        stopThreadPolling() {
+            if (this.threadPollInterval) {
+                clearInterval(this.threadPollInterval);
+                this.threadPollInterval = null;
+            }
+        },
+
+        async refreshThread(id) {
+            try {
+                const response = await fetch(`/contact-support/api/thread/${id}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.renderThreadMessages(data);
+                }
+            } catch (e) {
+                console.error('Failed to refresh thread', e);
+            }
+        },
+
+        renderThreadMessages(data) {
+            const container = document.getElementById('thread-messages');
+            const currentScroll = container.scrollTop;
+            const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+            
+            // Header (Original Message)
+            let html = `
+                <div class="flex justify-end mb-3">
+                    <div class="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 rounded-lg rounded-tr-none p-3 max-w-[85%] text-xs">
+                         <p class="whitespace-pre-wrap">${data.message.content}</p>
+                         <p class="text-[10px] opacity-70 mt-1 text-right">${data.message.created_at}</p>
+                    </div>
+                </div>
+            `;
+
+            // Replies
+            data.replies.forEach(reply => {
+                if (reply.is_admin) {
+                    html += `
+                        <div class="flex justify-start mb-3">
+                            <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200 rounded-lg rounded-tl-none p-3 max-w-[85%] text-xs shadow-sm">
+                                <p class="font-bold text-[10px] text-primary-600 mb-0.5">Admin Support</p>
+                                <p class="whitespace-pre-wrap">${reply.message}</p>
+                                <p class="text-[10px] text-gray-400 mt-1">${reply.created_at}</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                         <div class="flex justify-end mb-3">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100 rounded-lg rounded-tr-none p-3 max-w-[85%] text-xs">
+                                 <p class="whitespace-pre-wrap">${reply.message}</p>
+                                 <p class="text-[10px] opacity-70 mt-1 text-right">${reply.created_at}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+            
+            // Keep scroll position or scroll to bottom if was at bottom
+            if (isAtBottom) {
+                container.scrollTop = container.scrollHeight;
+            } else {
+                container.scrollTop = currentScroll;
+            }
+        },
+
+        async loadMessages(silent = false) {
+            if (!silent) this.setLoading(true);
             try {
                 const response = await fetch("{{ route('contact.support.api.messages') }}");
                 const data = await response.json();
@@ -108,7 +209,7 @@
             } catch (e) {
                 console.error('Failed to load messages', e);
             } finally {
-                this.setLoading(false);
+                if (!silent) this.setLoading(false);
             }
         },
 
@@ -128,7 +229,7 @@
                     <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">${msg.message_preview}</p>
                     <div class="mt-2 flex items-center justify-between">
                         <span class="text-[10px] px-1.5 py-0.5 rounded ${msg.status_color}">${msg.status_label}</span>
-                        ${msg.status === 'replied' ? '<span class="flex h-2 w-2 rounded-full bg-green-500"></span>' : ''}
+                        ${msg.status === 'replied' ? '<span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>' : ''}
                     </div>
                 </div>
             `).join('');
@@ -157,6 +258,8 @@
     }
 
     function showChatList() {
+        chatWidget.currentThreadId = null;
+        chatWidget.stopThreadPolling();
         document.getElementById('view-list').classList.remove('hidden');
         document.getElementById('view-thread').classList.add('hidden');
         // Reload list to refresh latest status
@@ -165,6 +268,8 @@
 
     async function openThread(id) {
         chatWidget.setLoading(true);
+        chatWidget.currentThreadId = id;
+        
         try {
             const response = await fetch(`/contact-support/api/thread/${id}`);
             const data = await response.json();
@@ -174,51 +279,15 @@
                 document.getElementById('thread-subject').textContent = data.message.subject;
                 document.getElementById('current-thread-id').value = data.message.id;
                 
-                // Render Thread
-                const container = document.getElementById('thread-messages');
-                
-                // Header (Original Message)
-                let html = `
-                    <div class="flex justify-end mb-3">
-                        <div class="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100 rounded-lg rounded-tr-none p-3 max-w-[85%] text-xs">
-                             <p class="whitespace-pre-wrap">${data.message.content}</p>
-                             <p class="text-[10px] opacity-70 mt-1 text-right">${data.message.created_at}</p>
-                        </div>
-                    </div>
-                `;
-
-                // Replies
-                data.replies.forEach(reply => {
-                    if (reply.is_admin) {
-                        html += `
-                            <div class="flex justify-start mb-3">
-                                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200 rounded-lg rounded-tl-none p-3 max-w-[85%] text-xs shadow-sm">
-                                    <p class="font-bold text-[10px] text-primary-600 mb-0.5">Admin Support</p>
-                                    <p class="whitespace-pre-wrap">${reply.message}</p>
-                                    <p class="text-[10px] text-gray-400 mt-1">${reply.created_at}</p>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        html += `
-                             <div class="flex justify-end mb-3">
-                                <div class="bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100 rounded-lg rounded-tr-none p-3 max-w-[85%] text-xs">
-                                     <p class="whitespace-pre-wrap">${reply.message}</p>
-                                     <p class="text-[10px] opacity-70 mt-1 text-right">${reply.created_at}</p>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-
-                container.innerHTML = html;
-                
-                // Scroll to bottom
-                container.scrollTop = container.scrollHeight;
+                // Render Thread using shared method
+                chatWidget.renderThreadMessages(data);
 
                 // Switch View
                 document.getElementById('view-list').classList.add('hidden');
                 document.getElementById('view-thread').classList.remove('hidden');
+                
+                // Start polling for this thread
+                chatWidget.startThreadPolling(id);
             }
         } catch (e) {
             console.error('Error fetching thread', e);

@@ -478,4 +478,45 @@ class ContactController extends Controller
             'count' => ContactMessage::unread()->count(),
         ]);
     }
+
+    /**
+     * Get message replies for super admin real-time polling (JSON).
+     */
+    public function getAdminReplies(ContactMessage $message)
+    {
+        $message->load(['replies.user']);
+
+        $replies = $message->replies->map(function($reply) {
+            return [
+                'id' => $reply->id,
+                'message' => $reply->message,
+                'is_admin' => $reply->is_admin_reply,
+                'sender_name' => $reply->is_admin_reply 
+                    ? 'Admin Support' 
+                    : ($reply->user->name ?? 'User'),
+                'created_at' => $reply->created_at->format('d M Y, H:i'),
+            ];
+        });
+
+        // Include legacy reply if exists
+        $legacyReply = null;
+        if ($message->reply_message && $message->replies->count() == 0) {
+            $legacyReply = [
+                'id' => 'legacy',
+                'message' => $message->reply_message,
+                'is_admin' => true,
+                'sender_name' => 'Admin',
+                'created_at' => $message->replied_at ? $message->replied_at->format('d M Y, H:i') : '',
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'replies' => $replies,
+            'legacy_reply' => $legacyReply,
+            'replies_count' => $message->replies->count(),
+            'status' => $message->status,
+            'status_label' => $message->status_label,
+        ]);
+    }
 }

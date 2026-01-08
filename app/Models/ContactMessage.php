@@ -94,7 +94,7 @@ class ContactMessage extends Model
      */
     public function replies()
     {
-        return $this->hasMany(ContactReply::class);
+        return $this->hasMany(ContactReply::class)->orderBy('created_at', 'asc');
     }
 
     /**
