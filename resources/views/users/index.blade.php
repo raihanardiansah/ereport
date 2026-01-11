@@ -46,9 +46,73 @@
         </form>
     </div>
 
-    <!-- Users Table -->
+    <!-- Users Table (Desktop) / Cards (Mobile) -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="overflow-x-auto">
+        <!-- Mobile Card View -->
+        <div class="md:hidden divide-y divide-gray-100">
+            @forelse($users as $user)
+            <div class="p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center min-w-0">
+                        <div class="w-10 h-10 rounded-full overflow-hidden mr-3 bg-gray-100 shrink-0">
+                            <img src="{{ $user->avatar_url }}" 
+                                 alt="{{ $user->name }}" 
+                                 class="w-full h-full object-cover"
+                                 onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&color=7F9CF5&background=EBF4FF'">
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-medium text-gray-900 truncate">{{ $user->name }}</p>
+                            <p class="text-sm text-gray-500 truncate">{{ $user->email }}</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ml-2
+                        @if($user->role === 'manajemen_sekolah') bg-purple-100 text-purple-700
+                        @elseif($user->role === 'staf_kesiswaan') bg-blue-100 text-blue-700
+                        @elseif($user->role === 'guru') bg-green-100 text-green-700
+                        @else bg-yellow-100 text-yellow-700 @endif">
+                        {{ $user->getRoleDisplayName() }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <div class="text-gray-500">
+                        <span class="font-mono">{{ $user->username }}</span>
+                        @if($user->nip_nisn)
+                            <span class="mx-1">•</span>
+                            <span>{{ $user->nip_nisn }}</span>
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <a href="{{ route('users.edit', $user) }}" 
+                           class="p-2 text-secondary-600 hover:bg-secondary-50 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </a>
+                        <form method="POST" action="{{ route('users.destroy', $user) }}" 
+                              onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="p-2 text-danger-600 hover:bg-danger-50 rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="p-12 text-center text-gray-500">
+                <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <p class="font-medium">Belum ada pengguna</p>
+            </div>
+            @endforelse
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50 border-b border-gray-100">
                     <tr>
@@ -91,13 +155,13 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center space-x-2 text-xs font-medium">
-                                <span class="px-2 py-0.5 rounded bg-green-100 text-green-700 tooltip" title="Laporan Positif">
+                                <span class="px-2 py-0.5 rounded bg-green-100 text-green-700" title="Laporan Positif">
                                     +{{ $user->positive_index }}
                                 </span>
-                                <span class="px-2 py-0.5 rounded bg-gray-100 text-gray-600 tooltip" title="Laporan Netral">
+                                <span class="px-2 py-0.5 rounded bg-gray-100 text-gray-600" title="Laporan Netral">
                                     {{ $user->neutral_index }}
                                 </span>
-                                <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 tooltip" title="Laporan Negatif">
+                                <span class="px-2 py-0.5 rounded bg-red-100 text-red-700" title="Laporan Negatif">
                                     -{{ $user->negative_index }}
                                 </span>
                             </div>
@@ -131,7 +195,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                             <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>

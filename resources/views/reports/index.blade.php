@@ -76,9 +76,9 @@
             @forelse($reports as $report)
             <a href="{{ route('reports.show', $report) }}" class="block p-4 sm:p-6 hover:bg-gray-50 transition-colors overflow-hidden">
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <div class="flex-grow min-w-0">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-gray-900 mb-1">{{ $report->title }}</h3>
                         <div class="flex items-center gap-2 mb-2 flex-wrap">
-                            <h3 class="font-semibold text-gray-900 truncate">{{ $report->title }}</h3>
                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium shrink-0
                                 @if($report->status === 'selesai') bg-green-100 text-green-700
                                 @elseif($report->status === 'ditindaklanjuti') bg-blue-100 text-blue-700
