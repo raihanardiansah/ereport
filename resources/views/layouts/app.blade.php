@@ -17,7 +17,7 @@
         }
     </script>
 </head>
-<body class="antialiased bg-gray-100">
+<body class="antialiased bg-gray-100 overflow-x-hidden">
     <div id="google_translate_element" class="hidden"></div>
     <div class="min-h-screen flex">
         <!-- Sidebar -->
@@ -207,7 +207,7 @@
         </aside>
 
         <!-- Main Content -->
-        <div class="flex-1 lg:ml-64">
+        <div class="flex-1 lg:ml-64 overflow-x-hidden">
             <!-- Top Header -->
             <header class="sticky top-0 z-40 bg-white border-b border-gray-200 h-16">
                 <div class="flex items-center justify-between h-full px-4 lg:px-8">
