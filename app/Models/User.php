@@ -78,6 +78,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get reports submitted by this user.
+     */
+    public function reports(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Report::class);
+    }
+
+    /**
      * Get the school this user belongs to.
      */
     public function school(): BelongsTo

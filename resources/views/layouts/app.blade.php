@@ -312,11 +312,7 @@
                         <!-- User Dropdown -->
                         <div class="relative" x-data="{ open: false }">
                             <button onclick="toggleUserMenu()" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
-                                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                                    <span class="text-primary-700 font-semibold text-sm">
-                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                    </span>
-                                </div>
+                                <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="w-8 h-8 rounded-full object-cover">
                                 <div class="hidden md:block text-left">
                                     <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</p>
                                     <p class="text-xs text-gray-500">{{ auth()->user()->getRoleDisplayName() }}</p>
