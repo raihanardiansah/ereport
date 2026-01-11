@@ -34,7 +34,7 @@ class EmailService
             }
 
             foreach ($recipients as $email) {
-                Mail::to($email)->queue(new ReportSubmittedMail($report));
+                Mail::to($email)->send(new ReportSubmittedMail($report));
             }
 
             Log::info('Report submitted emails sent', [
@@ -59,7 +59,7 @@ class EmailService
             $creator = $report->user;
             
             if ($creator && $creator->email) {
-                Mail::to($creator->email)->queue(
+                Mail::to($creator->email)->send(
                     new ReportStatusChangedMail($report, $oldStatus, $newStatus)
                 );
 
@@ -91,7 +91,7 @@ class EmailService
                 ->first();
 
             if ($admin && $admin->email) {
-                Mail::to($admin->email)->queue(
+                Mail::to($admin->email)->send(
                     new SubscriptionExpiringMail($subscription, $daysRemaining)
                 );
 
@@ -157,7 +157,7 @@ class EmailService
                 ->take(5)
                 ->get();
 
-            Mail::to($admin->email)->queue(
+            Mail::to($admin->email)->send(
                 new WeeklyDigestMail($school, $stats, $recentReports)
             );
 
