@@ -77,7 +77,7 @@
             <a href="{{ route('reports.show', $report) }}" class="block p-6 hover:bg-gray-50 transition-colors">
                 <div class="flex items-start justify-between">
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-3 mb-2">
+                        <div class="flex items-center gap-3 mb-2 flex-wrap">
                             <h3 class="font-semibold text-gray-900 truncate">{{ $report->title }}</h3>
                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
                                 @if($report->status === 'selesai') bg-green-100 text-green-700
@@ -86,6 +86,9 @@
                                 @else bg-gray-100 text-gray-700 @endif">
                                 {{ ucfirst($report->status) }}
                             </span>
+                            @if($report->isEscalated())
+                                {!! $report->escalation_badge !!}
+                            @endif
                         </div>
                         <p class="text-gray-600 text-sm line-clamp-2 mb-3">{{ Str::limit($report->content, 150) }}</p>
                         <div class="flex items-center gap-4 text-sm text-gray-500">

@@ -25,11 +25,15 @@ class Report extends Model
         'ai_category',
         'manual_category',
         'status',
+        'escalated_at',
+        'escalation_level',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'escalated_at' => 'datetime',
+        'escalation_level' => 'integer',
     ];
 
     /**
@@ -220,5 +224,50 @@ class Report extends Model
         return $this->accusedUsers()
             ->where('role', 'siswa')
             ->exists();
+    }
+
+    /**
+     * Check if report is escalated.
+     */
+    public function isEscalated(): bool
+    {
+        return $this->escalation_level > 0;
+    }
+
+    /**
+     * Get escalation badge HTML for UI.
+     */
+    public function getEscalationBadgeAttribute(): ?string
+    {
+        if ($this->escalation_level === 0) {
+            return null;
+        }
+
+        return match ($this->escalation_level) {
+            1 => '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">⚠️ Eskalasi Lv.1</span>',
+            2 => '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">🚨 Eskalasi Lv.2</span>',
+            default => null,
+        };
+    }
+
+    /**
+     * Get escalation level label.
+     */
+    public function getEscalationLabelAttribute(): ?string
+    {
+        return match ($this->escalation_level) {
+            0 => null,
+            1 => 'Eskalasi ke Staf Kesiswaan',
+            2 => 'Eskalasi ke Kepala Sekolah',
+            default => null,
+        };
+    }
+
+    /**
+     * Get hours since report was created.
+     */
+    public function getHoursPendingAttribute(): int
+    {
+        return (int) now()->diffInHours($this->created_at);
     }
 }

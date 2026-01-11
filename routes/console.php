@@ -24,3 +24,9 @@ Schedule::command('subscriptions:activate-pending')
     ->timezone('Asia/Jakarta')
     ->withoutOverlapping();
 
+// Auto-escalate pending reports every 15 minutes
+Schedule::command('reports:escalate')
+    ->everyFifteenMinutes()
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping();
+

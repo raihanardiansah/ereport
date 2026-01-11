@@ -21,6 +21,10 @@ class User extends Authenticatable
         'nip_nisn',
         'phone',
         'email_preferences',
+        'total_points',
+        'current_streak',
+        'last_activity_date',
+        'avatar_path',
     ];
 
     protected $hidden = [
@@ -35,6 +39,9 @@ class User extends Authenticatable
             'password' => 'hashed',
             'locked_until' => 'datetime',
             'email_preferences' => 'array',
+            'last_activity_date' => 'date',
+            'total_points' => 'integer',
+            'current_streak' => 'integer',
         ];
     }
 
@@ -229,6 +236,37 @@ class User extends Authenticatable
     public function getAccusedCountAttribute(): int
     {
         return $this->reportsAsAccused()->count();
+    }
+
+    /**
+     * Get badges earned by this user.
+     */
+    public function badges(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Badge::class, 'user_badges')
+            ->withPivot('earned_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get points history for this user.
+     */
+    public function points(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserPoint::class);
+    }
+
+    /**
+     * Get avatar URL or default UI Avatar.
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->avatar_path && Storage::disk('public')->exists($this->avatar_path)) {
+            return Storage::url($this->avatar_path);
+        }
+
+        $name = urlencode($this->name);
+        return "https://ui-avatars.com/api/?name={$name}&color=7F9CF5&background=EBF4FF";
     }
 }
 

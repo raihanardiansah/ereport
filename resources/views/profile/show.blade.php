@@ -8,8 +8,10 @@
         <!-- Profile Card -->
         <div class="lg:col-span-1">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 text-center">
-                <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center mb-4">
-                    <span class="text-white text-4xl font-bold">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                <div class="w-24 h-24 mx-auto mb-4 relative">
+                    <img class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" 
+                        src="{{ $user->avatar_url }}" 
+                        alt="{{ $user->name }}" />
                 </div>
                 <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $user->name }}</h2>
                 <p class="text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
@@ -81,7 +83,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Informasi Profil</h3>
                 
-                <form method="POST" action="{{ route('profile.update') }}">
+                <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     
@@ -101,6 +103,32 @@
                                 class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             @error('email')
                             <p class="text-danger-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto Profil</label>
+                            <div class="flex items-center space-x-4">
+                                <div class="shrink-0">
+                                    <img class="h-12 w-12 object-cover rounded-full border border-gray-200" 
+                                        src="{{ $user->avatar_url }}" 
+                                        alt="Current profile photo" />
+                                </div>
+                                <label class="block w-full">
+                                    <span class="sr-only">Choose profile photo</span>
+                                    <input type="file" name="avatar" accept="image/*"
+                                        class="block w-full text-sm text-gray-500
+                                        file:mr-4 file:py-2 file:px-4
+                                        file:rounded-full file:border-0
+                                        file:text-sm file:font-semibold
+                                        file:bg-primary-50 file:text-primary-700
+                                        hover:file:bg-primary-100 dark:file:bg-primary-900/30 dark:file:text-primary-300
+                                    "/>
+                                </label>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">JPG, PNG, atau WebP. Maksimal 5MB.</p>
+                            @error('avatar')
+                                <p class="text-danger-600 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                         

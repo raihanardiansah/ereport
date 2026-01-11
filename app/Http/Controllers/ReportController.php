@@ -6,6 +6,7 @@ use App\Models\Notification;
 use App\Models\Report;
 use App\Models\User;
 use App\Services\EmailService;
+use App\Services\GamificationService;
 use App\Services\SentimentAnalysisService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -222,6 +223,15 @@ public function __construct(SentimentAnalysisService $sentimentService)
         
         // Send email notifications
         EmailService::notifyReportSubmitted($report);
+
+        // Award gamification points
+        $gamification = app(GamificationService::class);
+        $isFirstReport = $user->reports()->count() === 1;
+        
+        if ($isFirstReport) {
+            $gamification->awardPoints($user, 'first_report', $report);
+        }
+        $gamification->awardPoints($user, 'report_submitted', $report);
 
         return redirect()->route('reports.show', $report)
             ->with('success', 'Laporan berhasil dikirim.');

@@ -28,14 +28,31 @@ class ProfileController extends Controller
             'name' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z\s]+$/'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'phone' => ['nullable', 'string', 'regex:/^(\+62|62|0)?8[0-9]{8,13}$/'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:5120'], // Max 5MB
         ], [
             'name.regex' => 'Nama hanya boleh huruf dan spasi.',
             'phone.regex' => 'Format nomor HP tidak valid. Contoh: 08123456789 atau +628123456789',
+            'avatar.image' => 'File harus berupa gambar.',
+            'avatar.max' => 'Ukuran foto maksimal 5MB.',
         ]);
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->phone = $this->normalizePhone($validated['phone'] ?? null);
+
+        // Handle Avatar Upload
+        if ($request->hasFile('avatar')) {
+            $compressionService = new \App\Services\ImageCompressionService();
+            $path = $compressionService->compressAndSaveAvatar($request->file('avatar'));
+
+            // Delete old avatar if exists
+            if ($user->avatar_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar_path);
+            }
+
+            $user->avatar_path = $path;
+        }
+
         $user->save();
 
         return back()->with('success', 'Profil berhasil diperbarui.');
