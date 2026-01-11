@@ -392,13 +392,38 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h4 class="font-medium text-gray-900 mb-4">Pengirim</h4>
                 <div class="flex items-center">
-                    <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center mr-3">
-                        <span class="text-primary-700 font-semibold">{{ strtoupper(substr($report->user->name, 0, 1)) }}</span>
+                    @if($report->is_anonymous)
+                    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
                     </div>
                     <div>
-                        <p class="font-medium text-gray-900">{{ $report->user->name }}</p>
+                        <p class="font-medium text-gray-900">
+                            @if(auth()->id() === $report->user_id)
+                                Anonim (Anda)
+                            @else
+                                Pengguna Anonim
+                            @endif
+                        </p>
+                        <p class="text-sm text-gray-500">Identitas disembunyikan</p>
+                    </div>
+                    @else
+                    <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center mr-3">
+                        @if($report->user->avatar_url)
+                            <img src="{{ $report->user->avatar_url }}" 
+                                 alt="{{ $report->user->name }}" 
+                                 class="w-10 h-10 rounded-full object-cover"
+                                 onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($report->user->name) }}&color=7F9CF5&background=EBF4FF'">
+                        @else
+                            <span class="text-primary-700 font-semibold">{{ strtoupper(substr($report->user->name, 0, 1)) }}</span>
+                        @endif
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900">{{ $report->user->user_name ?? $report->user->name }}</p>
                         <p class="text-sm text-gray-500">{{ $report->user->getRoleDisplayName() }}</p>
                     </div>
+                    @endif
                 </div>
             </div>
 

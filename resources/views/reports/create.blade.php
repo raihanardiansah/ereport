@@ -49,7 +49,7 @@
     @endif
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-2xl">
-        <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="space-y-6">
+        <form id="reportForm" method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
             <!-- AI Auto-generates Title -->
@@ -230,7 +230,7 @@
 
     <script>
         // Form submit handler - show loading overlay
-        document.querySelector('form').addEventListener('submit', function(e) {
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
             const submitBtn = document.getElementById('submit-btn');
             const btnText = document.getElementById('btn-text');
             const btnLoading = document.getElementById('btn-loading');
@@ -238,29 +238,32 @@
             const cancelBtn = document.getElementById('cancel-btn');
             const aiStatus = document.getElementById('ai-status');
             
-            // Disable button and show loading
-            submitBtn.disabled = true;
-            cancelBtn.style.pointerEvents = 'none';
-            cancelBtn.style.opacity = '0.5';
-            btnText.classList.add('hidden');
-            btnLoading.classList.remove('hidden');
-            
-            // Show fullscreen overlay
-            overlay.classList.remove('hidden');
-            
-            // Animate status text
-            const statuses = [
-                'Menganalisis isi laporan...',
-                'Menentukan kategori...',
-                'Menganalisis sentimen...',
-                'Membuat judul otomatis...',
-                'Hampir selesai...'
-            ];
-            let i = 0;
-            const statusInterval = setInterval(() => {
-                i = (i + 1) % statuses.length;
-                if (aiStatus) aiStatus.textContent = statuses[i];
-            }, 1500);
+            // Use setTimeout to allow the form submission to start before disabling UI
+            setTimeout(() => {
+                // Disable button and show loading
+                submitBtn.disabled = true;
+                cancelBtn.style.pointerEvents = 'none';
+                cancelBtn.style.opacity = '0.5';
+                btnText.classList.add('hidden');
+                btnLoading.classList.remove('hidden');
+                
+                // Show fullscreen overlay
+                overlay.classList.remove('hidden');
+                
+                // Animate status text
+                const statuses = [
+                    'Menganalisis isi laporan...',
+                    'Menentukan kategori...',
+                    'Menganalisis sentimen...',
+                    'Membuat judul otomatis...',
+                    'Hampir selesai...'
+                ];
+                let i = 0;
+                const statusInterval = setInterval(() => {
+                    i = (i + 1) % statuses.length;
+                    if (aiStatus) aiStatus.textContent = statuses[i];
+                }, 1500);
+            }, 0);
         });
 
         // Character counter

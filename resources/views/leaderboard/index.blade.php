@@ -42,7 +42,9 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <img class="h-10 w-10 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow-sm" 
-                                            src="{{ $player->avatar_url }}" alt="{{ $player->name }}">
+                                            src="{{ $player->avatar_url }}" 
+                                            alt="{{ $player->name }}"
+                                            onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($player->name) }}&color=7F9CF5&background=EBF4FF'">
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900 dark:text-gray-100 flex items-center">
                                                 {{ $player->name }}

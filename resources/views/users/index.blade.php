@@ -65,8 +65,11 @@
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center mr-3">
-                                    <span class="text-primary-700 font-semibold">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                                <div class="w-10 h-10 rounded-full overflow-hidden mr-3 bg-gray-100">
+                                    <img src="{{ $user->avatar_url }}" 
+                                         alt="{{ $user->name }}" 
+                                         class="w-full h-full object-cover"
+                                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&color=7F9CF5&background=EBF4FF'">
                                 </div>
                                 <div>
                                     <p class="font-medium text-gray-900">{{ $user->name }}</p>

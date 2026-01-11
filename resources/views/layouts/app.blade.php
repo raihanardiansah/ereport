@@ -312,7 +312,12 @@
                         <!-- User Dropdown -->
                         <div class="relative" x-data="{ open: false }">
                             <button onclick="toggleUserMenu()" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
-                                <div class="w-8 h-8 rounded-full overflow-hidden shrink-0"><img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="w-full h-full object-cover"></div>
+                                <div class="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                                    <img src="{{ auth()->user()->avatar_url }}" 
+                                         alt="{{ auth()->user()->name }}" 
+                                         class="w-full h-full object-cover"
+                                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&color=7F9CF5&background=EBF4FF'">
+                                </div>
                                 <div class="hidden md:block text-left">
                                     <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</p>
                                     <p class="text-xs text-gray-500">{{ auth()->user()->getRoleDisplayName() }}</p>
