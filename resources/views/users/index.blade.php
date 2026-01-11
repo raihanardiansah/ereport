@@ -55,6 +55,7 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pengguna</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Username</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Peran</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Indeks Perilaku</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">NIP/NISN</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -84,6 +85,19 @@
                                 @else bg-yellow-100 text-yellow-700 @endif">
                                 {{ $user->getRoleDisplayName() }}
                             </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center space-x-2 text-xs font-medium">
+                                <span class="px-2 py-0.5 rounded bg-green-100 text-green-700 tooltip" title="Laporan Positif">
+                                    +{{ $user->positive_index }}
+                                </span>
+                                <span class="px-2 py-0.5 rounded bg-gray-100 text-gray-600 tooltip" title="Laporan Netral">
+                                    {{ $user->neutral_index }}
+                                </span>
+                                <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 tooltip" title="Laporan Negatif">
+                                    -{{ $user->negative_index }}
+                                </span>
+                            </div>
                         </td>
                         <td class="px-6 py-4 text-gray-600">
                             {{ $user->nip_nisn ?? '-' }}

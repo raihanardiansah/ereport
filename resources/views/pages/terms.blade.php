@@ -23,18 +23,56 @@
     <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="/">
-                        <img src="https://i.ibb.co.com/bgHHDbVR/Logo-1-1.png" alt="Logo" class="h-11">
+                    <a href="/" class="flex items-center gap-2">
+                        <img src="https://i.ibb.co.com/bgHHDbVR/Logo-1-1.png" alt="Logo" class="h-10 w-auto">
                     </a>
                 </div>
-                <div class="flex items-center space-x-6">
-                    <a href="/" class="text-gray-300 hover:text-white font-medium transition-colors">Beranda</a>
-                    <a href="/login" class="text-gray-300 hover:text-white font-medium transition-colors">Login</a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Beranda</a>
+                    <a href="/about" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Tentang</a>
+                    <a href="/blog" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Blog</a>
+                    <div class="h-5 w-px bg-white/10"></div>
+                    <a href="/login" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">Masuk</a>
+                    <a href="/register" class="text-sm font-medium bg-white text-slate-900 px-5 py-2.5 rounded-full hover:bg-gray-100 transition-colors">Daftar Sekarang</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white p-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-950 border-t border-white/10">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="/" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg">Beranda</a>
+                <a href="/about" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg">Tentang</a>
+                <a href="/blog" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg">Blog</a>
+                <div class="my-4 border-t border-white/10"></div>
+                <a href="/login" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg">Masuk</a>
+                <a href="/register" class="block px-3 py-3 text-base font-medium text-emerald-400 hover:text-emerald-300 hover:bg-white/5 rounded-lg">Daftar Sekarang</a>
+            </div>
+        </div>
     </nav>
+
+    <script>
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+    </script>
 
     <!-- Main Content -->
     <main class="pt-32 pb-20 min-h-screen">

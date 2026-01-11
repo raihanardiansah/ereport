@@ -153,6 +153,22 @@
                 @error('attachment')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
             </div>
 
+            <!-- Anonymous Reporting Toggle -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <label class="flex items-start cursor-pointer">
+                    <input type="checkbox" name="is_anonymous" id="is_anonymous" value="1"
+                        class="mt-1 w-5 h-5 text-amber-600 border-amber-300 rounded focus:ring-amber-500">
+                    <div class="ml-3">
+                        <span class="font-medium text-amber-800">🎭 Kirim sebagai Anonim</span>
+                        <p class="text-sm text-amber-700 mt-1">Identitas Anda akan disembunyikan dari pihak sekolah. Maksimal 3 laporan anonim per hari.</p>
+                    </div>
+                </label>
+                <input type="hidden" name="device_fingerprint" id="device_fingerprint" value="">
+                @error('is_anonymous')
+                    <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
+                @enderror
+            </div>
+
             <!-- Info Box -->
             <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
                 <div class="flex">

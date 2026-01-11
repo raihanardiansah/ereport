@@ -27,6 +27,8 @@ class Report extends Model
         'status',
         'escalated_at',
         'escalation_level',
+        'is_anonymous',
+        'device_fingerprint',
     ];
 
     protected $casts = [
@@ -34,6 +36,7 @@ class Report extends Model
         'updated_at' => 'datetime',
         'escalated_at' => 'datetime',
         'escalation_level' => 'integer',
+        'is_anonymous' => 'boolean',
     ];
 
     /**

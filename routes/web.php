@@ -55,6 +55,9 @@ Route::middleware(['auth', 'subscription'])->group(function () {
     // Main Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
+    // Leaderboard
+    Route::get('/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard.index');
+
     // Profile & Settings - All authenticated users
     Route::prefix('profile')->group(function () {
         Route::get('/', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
@@ -93,6 +96,12 @@ Route::middleware(['auth', 'subscription'])->group(function () {
     Route::get('/dashboard/siswa', [DashboardController::class, 'siswa'])
         ->middleware(RoleMiddleware::class . ':siswa')
         ->name('dashboard.siswa');
+
+    // Analytics for school admins
+    Route::middleware(RoleMiddleware::class . ':admin_sekolah,manajemen_sekolah,super_admin')->group(function () {
+        Route::get('/analytics', [\App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics.index');
+        Route::get('/analytics/export', [\App\Http\Controllers\AnalyticsController::class, 'export'])->name('analytics.export');
+    });
 
     // Reports
     Route::resource('reports', \App\Http\Controllers\ReportController::class)

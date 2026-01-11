@@ -99,6 +99,14 @@
                         </svg>
                         Penanganan Guru
                     </a>
+
+                    <!-- Leaderboard -->
+                    <a href="{{ route('leaderboard.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('leaderboard*') ? 'bg-gray-800 text-white' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                        </svg>
+                        Papan Peringkat
+                    </a>
                     @endif
                     @endif {{-- End of subscriptionExpired else block --}}
 
@@ -623,6 +631,78 @@
                 showToast("{{ session('info') }}", 'info');
             @endif
         });
+
+        // Real-time Notification Polling
+        let lastNotificationCount = {{ $unreadCount ?? 0 }};
+        const notificationSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU5vT2//');
+
+        function playNotificationSound() {
+            try {
+                // Simple beep sound
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (e) {
+                console.log('Audio notification not supported');
+            }
+        }
+
+        function pollNotifications() {
+            fetch('{{ route("notifications.index") }}', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.querySelector('#notification-wrapper .absolute');
+                const newCount = data.unread_count;
+                
+                // Update badge
+                if (newCount > 0) {
+                    if (badge) {
+                        badge.textContent = newCount > 9 ? '9+' : newCount;
+                        badge.classList.remove('hidden');
+                    } else {
+                        // Create badge if doesn't exist
+                        const btn = document.querySelector('#notification-wrapper button');
+                        if (btn) {
+                            const newBadge = document.createElement('span');
+                            newBadge.className = 'absolute top-1 right-1 min-w-[18px] h-[18px] flex items-center justify-center text-xs font-bold text-white bg-danger-500 rounded-full px-1';
+                            newBadge.textContent = newCount > 9 ? '9+' : newCount;
+                            btn.appendChild(newBadge);
+                        }
+                    }
+                    
+                    // Play sound if new notifications
+                    if (newCount > lastNotificationCount) {
+                        playNotificationSound();
+                        showToast('Ada notifikasi baru! 🔔', 'info');
+                    }
+                } else if (badge) {
+                    badge.classList.add('hidden');
+                }
+                
+                lastNotificationCount = newCount;
+            })
+            .catch(err => console.log('Notification poll error:', err));
+        }
+
+        // Poll every 30 seconds
+        setInterval(pollNotifications, 30000);
     </script>
     
     @include('partials.chat-widget')

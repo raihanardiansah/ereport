@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnonymousReportLimit;
 use App\Models\Notification;
 use App\Models\Report;
 use App\Models\User;
@@ -151,6 +152,8 @@ public function __construct(SentimentAnalysisService $sentimentService)
                 'mimes:jpg,jpeg,png,pdf',
                 'max:3072', // 3MB
             ],
+            'is_anonymous' => ['nullable', 'boolean'],
+            'device_fingerprint' => ['nullable', 'string', 'max:64'],
         ], [
             'title.max' => 'Judul maksimal 100 karakter.',
             'content.min' => 'Isi laporan minimal 20 karakter.',
@@ -158,6 +161,17 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'attachment.mimes' => 'File harus JPG, PNG, atau PDF.',
             'attachment.max' => 'Ukuran file maksimal 3MB.',
         ]);
+
+        // Handle anonymous reporting with rate limiting
+        $isAnonymous = $request->boolean('is_anonymous');
+        $deviceFingerprint = $request->input('device_fingerprint');
+        
+        if ($isAnonymous && $deviceFingerprint) {
+            $ip = $request->ip();
+            if (!AnonymousReportLimit::canSubmitAnonymous($deviceFingerprint, $ip)) {
+                return back()->withErrors(['is_anonymous' => 'Anda telah mencapai batas maksimal 3 laporan anonim per hari.'])->withInput();
+            }
+        }
 
         // Verify reported user belongs to same school (if specified) - backward compatibility
         $reportedUserId = null;
@@ -201,7 +215,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
 
         $report = Report::create([
             'school_id' => $user->school_id,
-            'user_id' => $user->id,
+            'user_id' => $isAnonymous ? null : $user->id,
             'reported_user_id' => $reportedUserId,
             'title' => $title,
             'content' => $validated['content'],
@@ -210,7 +224,14 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'ai_classification' => $aiResult['sentiment'],
             'ai_category' => $aiResult['category'],
             'status' => 'dikirim',
+            'is_anonymous' => $isAnonymous,
+            'device_fingerprint' => $isAnonymous ? $deviceFingerprint : null,
         ]);
+
+        // Increment rate limit counter if anonymous
+        if ($isAnonymous && $deviceFingerprint) {
+            AnonymousReportLimit::incrementCount($deviceFingerprint, $request->ip());
+        }
         
 
         // Attach accused users (multi-accused support)

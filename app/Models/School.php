@@ -25,6 +25,7 @@ class School extends Model
         'trial_ends_at',
         'has_used_trial',
         'trial_used_at',
+        'allow_benchmarking',
     ];
 
     protected $casts = [
@@ -32,6 +33,7 @@ class School extends Model
         'trial_ends_at' => 'datetime',
         'trial_used_at' => 'datetime',
         'has_used_trial' => 'boolean',
+        'allow_benchmarking' => 'boolean',
     ];
 
     /**

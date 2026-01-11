@@ -30,3 +30,9 @@ Schedule::command('reports:escalate')
     ->timezone('Asia/Jakarta')
     ->withoutOverlapping();
 
+// Aggregate school statistics on the 1st of each month
+Schedule::command('statistics:aggregate')
+    ->monthlyOn(1, '02:00')
+    ->timezone('Asia/Jakarta');
+
+
