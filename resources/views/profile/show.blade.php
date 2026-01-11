@@ -8,9 +8,9 @@
         <!-- Profile Card -->
         <div class="lg:col-span-1">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center">
-                <!-- Avatar with ring - perfectly circular -->
+                <!-- Avatar with ring - responsive -->
                 <div class="mx-auto mb-6">
-                    <div class="w-28 h-28 rounded-full ring-4 ring-primary-500 ring-offset-4 ring-offset-white dark:ring-offset-gray-800 overflow-hidden mx-auto">
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-800 overflow-hidden mx-auto">
                         <img class="w-full h-full object-cover" 
                             src="{{ $user->avatar_url }}" 
                             alt="{{ $user->name }}" />
@@ -114,8 +114,8 @@
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto Profil</label>
                             <div class="flex items-center space-x-4">
-                                <div class="shrink-0">
-                                    <img class="h-12 w-12 object-cover rounded-full border border-gray-200 aspect-square" 
+                                <div class="shrink-0 w-10 h-10 rounded-full overflow-hidden ring-1 ring-gray-200 dark:ring-gray-600">
+                                    <img class="w-full h-full object-cover" 
                                         src="{{ $user->avatar_url }}" 
                                         alt="Current profile photo" />
                                 </div>
