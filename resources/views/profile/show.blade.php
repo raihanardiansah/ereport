@@ -8,10 +8,10 @@
         <!-- Profile Card -->
         <div class="lg:col-span-1">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center">
-                <!-- Avatar with gradient ring - perfectly circular -->
-                <div class="w-32 h-32 mx-auto mb-6">
-                    <div class="w-32 h-32 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 p-1 flex items-center justify-center">
-                        <img class="w-[120px] h-[120px] rounded-full object-cover bg-white dark:bg-gray-800" 
+                <!-- Avatar with ring - perfectly circular -->
+                <div class="mx-auto mb-6">
+                    <div class="w-28 h-28 rounded-full ring-4 ring-primary-500 ring-offset-4 ring-offset-white dark:ring-offset-gray-800 overflow-hidden mx-auto">
+                        <img class="w-full h-full object-cover" 
                             src="{{ $user->avatar_url }}" 
                             alt="{{ $user->name }}" />
                     </div>
