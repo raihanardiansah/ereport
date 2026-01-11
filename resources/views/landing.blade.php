@@ -647,17 +647,17 @@
                 <div>
                     <h4 class="text-white font-semibold mb-4">Perusahaan</h4>
                     <ul class="space-y-3">
-                        <li><a href="#" class="text-white/70 hover:text-white transition-colors">Tentang</a></li>
+                        <li><a href="/about" class="text-white/70 hover:text-white transition-colors">Tentang</a></li>
                         <li><a href="#contact" class="text-white/70 hover:text-white transition-colors">Kontak</a></li>
-                        <li><a href="#" class="text-white/70 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="/blog" class="text-white/70 hover:text-white transition-colors">Blog</a></li>
                     </ul>
                 </div>
                 
                 <div>
                     <h4 class="text-white font-semibold mb-4">Legal</h4>
                     <ul class="space-y-3">
-                        <li><a href="#" class="text-white/70 hover:text-white transition-colors">Privacy</a></li>
-                        <li><a href="#" class="text-white/70 hover:text-white transition-colors">Terms</a></li>
+                        <li><a href="/privacy" class="text-white/70 hover:text-white transition-colors">Privacy</a></li>
+                        <li><a href="/terms" class="text-white/70 hover:text-white transition-colors">Terms</a></li>
                     </ul>
                 </div>
             </div>
