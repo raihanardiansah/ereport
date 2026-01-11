@@ -59,6 +59,24 @@ class ProfileController extends Controller
     }
 
     /**
+     * Delete the user's profile avatar.
+     */
+    public function deleteAvatar()
+    {
+        $user = auth()->user();
+
+        if ($user->avatar_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar_path);
+            $user->avatar_path = null;
+            $user->save();
+
+            return back()->with('success', 'Foto profil berhasil dihapus.');
+        }
+
+        return back()->with('info', 'Tidak ada foto profil untuk dihapus.');
+    }
+
+    /**
      * Update the user's password.
      */
     public function updatePassword(Request $request)

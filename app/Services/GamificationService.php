@@ -148,9 +148,9 @@ class GamificationService
         ]);
 
         // Create notification
-        \App\Services\Notification::create([
+        \App\Models\Notification::create([
             'user_id' => $user->id,
-            'title' => '🏆 Badge Baru Diperoleh!',
+            'title' => 'Badge Baru Diperoleh!',
             'message' => "Selamat! Anda mendapatkan badge \"{$badge->name}\"",
             'type' => 'badge',
             'data' => [

@@ -62,6 +62,7 @@ Route::middleware(['auth', 'subscription'])->group(function () {
     Route::prefix('profile')->group(function () {
         Route::get('/', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
         Route::put('/', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/avatar', [\App\Http\Controllers\ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
         Route::put('/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password');
         
         // Session management
