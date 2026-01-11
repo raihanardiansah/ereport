@@ -20,7 +20,7 @@ class AggregateSchoolStatistics extends Command
         
         $this->info("Aggregating statistics for period: {$period}");
 
-        $schools = School::where('is_active', true)->get();
+        $schools = School::whereIn('subscription_status', ['active', 'trial'])->get();
         $bar = $this->output->createProgressBar($schools->count());
 
         foreach ($schools as $school) {

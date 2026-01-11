@@ -30,7 +30,7 @@ return new class extends Migration
 
         // Add benchmarking opt-in column to schools
         Schema::table('schools', function (Blueprint $table) {
-            $table->boolean('allow_benchmarking')->default(false)->after('is_active');
+            $table->boolean('allow_benchmarking')->default(false)->after('subscription_status');
         });
     }
 
