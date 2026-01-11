@@ -76,7 +76,7 @@
             @forelse($reports as $report)
             <a href="{{ route('reports.show', $report) }}" class="block p-6 hover:bg-gray-50 transition-colors">
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                    <div class="flex-1 min-w-0 w-full">
+                    <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-2 flex-wrap">
                             <h3 class="font-semibold text-gray-900 truncate max-w-full">{{ $report->title }}</h3>
                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium shrink-0

@@ -138,7 +138,16 @@
                             <div class="flex-1 min-w-0">
                                 <p class="font-medium text-gray-900 text-sm truncate">{{ $report->title }}</p>
                                 <p class="text-xs text-gray-500">
-                                    {{ $report->user->name }} • {{ $report->created_at->format('d/m/Y') }}
+                                    @if($report->is_anonymous)
+                                        @if(auth()->id() === $report->user_id)
+                                            Anonim (Anda)
+                                        @else
+                                            Pengguna Anonim
+                                        @endif
+                                    @else
+                                        {{ $report->user->name }}
+                                    @endif
+                                     • {{ $report->created_at->format('d/m/Y') }}
                                     @if($report->accusedUsers->count() > 0)
                                         • {{ $report->accusedUsers->count() }} terdakwa
                                     @endif
