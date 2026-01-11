@@ -215,7 +215,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
 
         $report = Report::create([
             'school_id' => $user->school_id,
-            'user_id' => $isAnonymous ? null : $user->id,
+            'user_id' => $user->id, // Always store user_id - is_anonymous flag controls visibility
             'reported_user_id' => $reportedUserId,
             'title' => $title,
             'content' => $validated['content'],

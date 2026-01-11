@@ -7,20 +7,25 @@
     <div class="grid lg:grid-cols-3 gap-6">
         <!-- Profile Card -->
         <div class="lg:col-span-1">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 text-center">
-                <div class="w-24 h-24 mx-auto mb-4 relative">
-                    <img class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" 
-                        src="{{ $user->avatar_url }}" 
-                        alt="{{ $user->name }}" />
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center">
+                <!-- Avatar with gradient ring -->
+                <div class="w-32 h-32 mx-auto mb-6 relative">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 p-1">
+                        <img class="w-full h-full rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg" 
+                            src="{{ $user->avatar_url }}" 
+                            alt="{{ $user->name }}" />
+                    </div>
                 </div>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $user->name }}</h2>
-                <p class="text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
-                <span class="inline-flex items-center px-3 py-1 mt-3 rounded-full text-sm font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
+                
+                <!-- User info with better spacing -->
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ $user->name }}</h2>
+                <p class="text-gray-500 dark:text-gray-400 mb-4">{{ $user->email }}</p>
+                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 shadow-sm">
                     {{ $user->getRoleDisplayName() }}
                 </span>
                 
-                <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700 text-left">
-                    <div class="space-y-3 text-sm">
+                <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 text-left">
+                    <div class="space-y-4 text-sm">
                         <div class="flex items-center text-gray-600 dark:text-gray-400">
                             <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>

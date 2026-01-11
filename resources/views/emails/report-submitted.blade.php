@@ -26,7 +26,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📝 Laporan Baru Diterima</h1>
+            <h1>Laporan Baru Diterima</h1>
         </div>
         <div class="content">
             <div class="alert-box">
