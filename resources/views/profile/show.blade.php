@@ -8,10 +8,10 @@
         <!-- Profile Card -->
         <div class="lg:col-span-1">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center">
-                <!-- Avatar with gradient ring -->
-                <div class="w-32 h-32 mx-auto mb-6 relative">
-                    <div class="absolute inset-0 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 p-1">
-                        <img class="w-full h-full rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg" 
+                <!-- Avatar with gradient ring - perfectly circular -->
+                <div class="w-32 h-32 mx-auto mb-6">
+                    <div class="w-32 h-32 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 p-1 flex items-center justify-center">
+                        <img class="w-[120px] h-[120px] rounded-full object-cover bg-white dark:bg-gray-800" 
                             src="{{ $user->avatar_url }}" 
                             alt="{{ $user->name }}" />
                     </div>
@@ -115,7 +115,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto Profil</label>
                             <div class="flex items-center space-x-4">
                                 <div class="shrink-0">
-                                    <img class="h-12 w-12 object-cover rounded-full border border-gray-200" 
+                                    <img class="h-12 w-12 object-cover rounded-full border border-gray-200 aspect-square" 
                                         src="{{ $user->avatar_url }}" 
                                         alt="Current profile photo" />
                                 </div>
