@@ -73,7 +73,154 @@ class SentimentAnalysisService
     }
 
     /**
-     * Build the prompt for Gemini to analyze the report.
+     * Analyze report AND generate title in a SINGLE API call.
+     * This is faster than calling generateTitle() + analyzeReport() separately.
+     * 
+     * @param string $content Report content
+     * @return array ['title' => string, 'sentiment' => string, 'category' => string, 'confidence' => float]
+     */
+    public function analyzeReportFull(string $content): array
+    {
+        try {
+            $prompt = $this->buildFullPrompt($content);
+            
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])
+            ->timeout(30)
+            ->post("{$this->endpoint}?key={$this->apiKey}", [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $prompt]
+                        ]
+                    ]
+                ],
+                'generationConfig' => [
+                    'temperature' => 0.2,
+                    'topP' => 0.8,
+                    'maxOutputTokens' => 300,
+                ],
+            ]);
+
+            if ($response->failed()) {
+                Log::error('Gemini Full Analysis Failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+                return $this->getDefaultFullResult($content);
+            }
+
+            $result = $response->json();
+            Log::info('Gemini Full Analysis Response', ['response' => $result]);
+
+            return $this->parseFullResponse($result, $content);
+
+        } catch (\Throwable $e) {
+            Log::error('Gemini Full Analysis Error', [
+                'error' => $e->getMessage(),
+            ]);
+            return $this->getDefaultFullResult($content);
+        }
+    }
+
+    /**
+     * Build prompt for FULL analysis (title + sentiment + category).
+     */
+    protected function buildFullPrompt(string $content): string
+    {
+        return <<<PROMPT
+Anda adalah sistem AI untuk menganalisis laporan di sekolah Indonesia.
+
+Analisis laporan berikut dan berikan:
+1. **Judul**: Buat judul singkat (5-7 kata) yang merangkum inti laporan. Jangan awali dengan "Laporan" atau "Tentang".
+2. **Sentimen**: positif/negatif/netral
+3. **Kategori**: Pilih SATU dari: perilaku, akademik, kehadiran, bullying, konseling, kesehatan, fasilitas, prestasi, keamanan, ekstrakurikuler, sosial, keuangan, kebersihan, kantin, transportasi, teknologi, guru, kurikulum, perpustakaan, laboratorium, olahraga, keagamaan, saran, lainnya
+4. **Confidence**: 0.0-1.0
+
+---
+ISI LAPORAN:
+{$content}
+---
+
+Berikan jawaban dalam format JSON (HANYA JSON, tanpa teks lain):
+{"title": "Judul Singkat Disini", "sentiment": "positif|negatif|netral", "category": "kategori", "confidence": 0.9}
+PROMPT;
+    }
+
+    /**
+     * Parse full response including title.
+     */
+    protected function parseFullResponse(array $result, string $content): array
+    {
+        try {
+            $text = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+            $text = preg_replace('/```json\s*/', '', $text);
+            $text = preg_replace('/```\s*/', '', $text);
+            $text = trim($text);
+            
+            $parsed = json_decode($text, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::warning('Failed to parse Gemini Full JSON', ['text' => $text]);
+                return $this->getDefaultFullResult($content);
+            }
+
+            // Validate title
+            $title = trim($parsed['title'] ?? '');
+            if (empty($title) || strlen($title) > 100) {
+                $title = \Str::limit($content, 50);
+            }
+
+            // Validate sentiment
+            $sentiment = strtolower($parsed['sentiment'] ?? 'netral');
+            if (!in_array($sentiment, ['positif', 'negatif', 'netral'])) {
+                $sentiment = 'netral';
+            }
+
+            // Validate category
+            $validCategories = [
+                'perilaku', 'akademik', 'kehadiran', 'bullying', 'konseling',
+                'kesehatan', 'fasilitas', 'prestasi', 'keamanan', 'ekstrakurikuler',
+                'sosial', 'keuangan', 'kebersihan', 'kantin', 'transportasi',
+                'teknologi', 'guru', 'kurikulum', 'perpustakaan', 'laboratorium',
+                'olahraga', 'keagamaan', 'saran', 'lainnya'
+            ];
+            $category = strtolower($parsed['category'] ?? 'lainnya');
+            if (!in_array($category, $validCategories)) {
+                $category = 'lainnya';
+            }
+
+            $confidence = floatval($parsed['confidence'] ?? 0.5);
+
+            return [
+                'title' => $title,
+                'sentiment' => $sentiment,
+                'category' => $category,
+                'confidence' => min(1.0, max(0.0, $confidence)),
+            ];
+
+        } catch (\Throwable $e) {
+            Log::error('Failed to parse full response', ['error' => $e->getMessage()]);
+            return $this->getDefaultFullResult($content);
+        }
+    }
+
+    /**
+     * Get default full result for fallback.
+     */
+    protected function getDefaultFullResult(string $content): array
+    {
+        return [
+            'title' => \Str::limit($content, 50),
+            'sentiment' => 'netral',
+            'category' => 'lainnya',
+            'confidence' => 0.0,
+        ];
+    }
+
+    /**
+     * Build the prompt for Gemini to analyze the report (legacy, kept for compatibility).
      */
     protected function buildPrompt(string $title, string $content): string
     {

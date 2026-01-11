@@ -158,12 +158,6 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'attachment.max' => 'Ukuran file maksimal 3MB.',
         ]);
 
-        // Generate title if missing
-        $title = $validated['title'] ?? null;
-        if (empty($title)) {
-            $title = $this->sentimentService->generateTitle($validated['content']);
-        }
-
         // Verify reported user belongs to same school (if specified) - backward compatibility
         $reportedUserId = null;
         if (!empty($validated['reported_user_id'])) {
@@ -194,8 +188,11 @@ public function __construct(SentimentAnalysisService $sentimentService)
             );
         }
 
-        // Use Google Gemini AI for sentiment AND category analysis
-        $aiResult = $this->sentimentService->analyzeReport($title, $validated['content']);
+        // Use Google Gemini AI for FULL analysis (title + sentiment + category) in ONE call
+        $aiResult = $this->sentimentService->analyzeReportFull($validated['content']);
+        
+        // Use AI-generated title or user-provided (if any)
+        $title = $validated['title'] ?? $aiResult['title'];
 
         // Use user-selected category or fallback to AI-suggested category
         $userCategory = $validated['category'] ?? null;
