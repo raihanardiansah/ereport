@@ -297,4 +297,50 @@ class StudentCaseController extends Controller
 
         return view('student-cases.profile', compact('student', 'cases', 'reports', 'stats'));
     }
+
+    /**
+     * Reassign case to a different counselor.
+     */
+    public function reassignCase(Request $request, StudentCase $studentCase)
+    {
+        $user = auth()->user();
+
+        // Only admin and manajemen can reassign
+        if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah']) && !$user->isSuperAdmin()) {
+            abort(403);
+        }
+
+        if ($studentCase->school_id !== $user->school_id && !$user->isSuperAdmin()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'counselor_id' => ['required', 'exists:users,id'],
+        ]);
+
+        // Verify new counselor is from same school and has appropriate role
+        $newCounselor = \App\Models\User::where('id', $validated['counselor_id'])
+            ->where('school_id', $studentCase->school_id)
+            ->whereIn('role', ['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])
+            ->first();
+
+        if (!$newCounselor) {
+            return back()->withErrors(['counselor_id' => 'Konselor tidak valid atau tidak memiliki akses.']);
+        }
+
+        $oldCounselorId = $studentCase->counselor_id;
+        $studentCase->update(['counselor_id' => $validated['counselor_id']]);
+
+        // Notify new counselor
+        \App\Models\Notification::create([
+            'user_id' => $validated['counselor_id'],
+            'school_id' => $studentCase->school_id,
+            'type' => 'case_assigned',
+            'title' => 'Kasus Ditugaskan',
+            'message' => "Anda ditugaskan untuk menangani kasus '{$studentCase->title}'",
+            'data' => ['case_id' => $studentCase->id],
+        ]);
+
+        return back()->with('success', 'Kasus berhasil ditugaskan ulang ke ' . $newCounselor->name);
+    }
 }

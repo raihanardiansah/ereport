@@ -66,6 +66,15 @@
                     <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
                 </select>
             </div>
+            @if(auth()->user()->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) || auth()->user()->isSuperAdmin())
+            <div class="sm:w-40">
+                <select name="assigned" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
+                    <option value="">Semua Penugasan</option>
+                    <option value="me" {{ request('assigned') == 'me' ? 'selected' : '' }}>Ditugaskan ke Saya</option>
+                    <option value="unassigned" {{ request('assigned') == 'unassigned' ? 'selected' : '' }}>Belum Ditugaskan</option>
+                </select>
+            </div>
+            @endif
             <button type="submit" class="btn-secondary py-2">Filter</button>
         </form>
     </div>

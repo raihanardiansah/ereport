@@ -236,7 +236,7 @@
             @if($studentCase->counselor)
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h4 class="font-medium text-gray-900 mb-4">Konselor</h4>
-                <div class="flex items-center">
+                <div class="flex items-center mb-4">
                     <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                         <span class="text-blue-700 font-semibold">{{ strtoupper(substr($studentCase->counselor->name, 0, 1)) }}</span>
                     </div>
@@ -245,8 +245,36 @@
                         <p class="text-sm text-gray-500">{{ $studentCase->counselor->getRoleDisplayName() }}</p>
                     </div>
                 </div>
+
+                @if(auth()->user()->hasAnyRole(['admin_sekolah', 'manajemen_sekolah']) || auth()->user()->isSuperAdmin())
+                <div class="pt-4 border-t border-gray-100">
+                    <form method="POST" action="{{ route('student-cases.reassign', $studentCase) }}">
+                        @csrf
+                        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Tugaskan Ulang</label>
+                        <div class="space-y-2">
+                            <select name="counselor_id" required class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                @php
+                                    $counselors = \App\Models\User::where('school_id', auth()->user()->school_id)
+                                        ->whereIn('role', ['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])
+                                        ->where('id', '!=', $studentCase->counselor_id)
+                                        ->orderBy('name')
+                                        ->get();
+                                @endphp
+                                <option value="">-- Pilih Konselor --</option>
+                                @foreach($counselors as $counselor)
+                                    <option value="{{ $counselor->id }}">{{ $counselor->name }} ({{ $counselor->getRoleDisplayName() }})</option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="w-full px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+                                Ubah Konselor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                @endif
             </div>
             @endif
+
         </div>
     </div>
 

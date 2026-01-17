@@ -32,7 +32,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = Report::with(['user', 'school', 'reportedUser']);
+        $query = Report::with(['user', 'school', 'reportedUser', 'assignedTo']);
 
         // Filter by school for non-super admins
         if (!$user->isSuperAdmin()) {
@@ -77,6 +77,17 @@ public function __construct(SentimentAnalysisService $sentimentService)
         // Status filter
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        // Assignment filter
+        if ($request->filled('assigned')) {
+            if ($request->assigned === 'me') {
+                $query->where('assigned_to', $user->id);
+            } elseif ($request->assigned === 'unassigned') {
+                $query->whereNull('assigned_to');
+            } elseif (is_numeric($request->assigned)) {
+                $query->where('assigned_to', $request->assigned);
+            }
         }
 
         $reports = $query->latest()->paginate(10);
@@ -521,6 +532,74 @@ public function __construct(SentimentAnalysisService $sentimentService)
         }
 
         return back()->with('success', 'Komentar berhasil ditambahkan.');
+    }
+
+    /**
+     * Assign report to a user.
+     */
+    public function assignReport(Request $request, Report $report)
+    {
+        $user = auth()->user();
+        
+        // Only admin, manajemen, and staf_kesiswaan can assign
+        if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) && !$user->isSuperAdmin()) {
+            abort(403);
+        }
+
+        // Must be same school
+        if ($user->school_id !== $report->school_id && !$user->isSuperAdmin()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'assigned_to' => ['required', 'exists:users,id'],
+        ]);
+
+        // Verify assigned user is from same school and has appropriate role
+        $assignedUser = User::where('id', $validated['assigned_to'])
+            ->where('school_id', $report->school_id)
+            ->whereIn('role', ['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])
+            ->first();
+
+        if (!$assignedUser) {
+            return back()->withErrors(['assigned_to' => 'User tidak valid atau tidak memiliki akses.']);
+        }
+
+        $report->update(['assigned_to' => $validated['assigned_to']]);
+
+        // Create notification for assigned user
+        Notification::create([
+            'user_id' => $validated['assigned_to'],
+            'school_id' => $report->school_id,
+            'type' => 'report_assigned',
+            'title' => 'Laporan Ditugaskan',
+            'message' => "Anda ditugaskan untuk menangani laporan '{$report->title}'",
+            'data' => ['report_id' => $report->id],
+        ]);
+
+        return back()->with('success', 'Laporan berhasil ditugaskan ke ' . $assignedUser->name);
+    }
+
+    /**
+     * Remove assignment from report.
+     */
+    public function unassignReport(Report $report)
+    {
+        $user = auth()->user();
+        
+        // Only admin, manajemen, and staf_kesiswaan can unassign
+        if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) && !$user->isSuperAdmin()) {
+            abort(403);
+        }
+
+        // Must be same school
+        if ($user->school_id !== $report->school_id && !$user->isSuperAdmin()) {
+            abort(403);
+        }
+
+        $report->update(['assigned_to' => null]);
+
+        return back()->with('success', 'Penugasan laporan berhasil dihapus.');
     }
 }
 

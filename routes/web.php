@@ -113,6 +113,11 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         ->name('reports.classification');
     Route::post('/reports/{report}/comments', [\App\Http\Controllers\ReportController::class, 'storeComment'])
         ->name('reports.comments.store');
+    Route::post('/reports/{report}/assign', [\App\Http\Controllers\ReportController::class, 'assignReport'])
+        ->name('reports.assign');
+    Route::delete('/reports/{report}/assign', [\App\Http\Controllers\ReportController::class, 'unassignReport'])
+        ->name('reports.unassign');
+
 
     // Users Management - Admin Sekolah only
     Route::middleware(RoleMiddleware::class . ':admin_sekolah')->group(function () {
@@ -180,6 +185,7 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::post('/{studentCase}/resolve', [\App\Http\Controllers\StudentCaseController::class, 'resolve'])->name('student-cases.resolve');
         Route::post('/{studentCase}/follow-ups', [\App\Http\Controllers\StudentCaseController::class, 'addFollowUp'])->name('student-cases.follow-ups.store');
         Route::post('/{studentCase}/link-report', [\App\Http\Controllers\StudentCaseController::class, 'linkReport'])->name('student-cases.link-report');
+        Route::post('/{studentCase}/reassign', [\App\Http\Controllers\StudentCaseController::class, 'reassignCase'])->name('student-cases.reassign');
         Route::get('/student/{student}/profile', [\App\Http\Controllers\StudentCaseController::class, 'studentProfile'])->name('student-cases.student-profile');
     });
 
@@ -192,6 +198,7 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::post('/{teacherCase}/resolve', [\App\Http\Controllers\TeacherCaseController::class, 'resolve'])->name('teacher-cases.resolve');
         Route::post('/{teacherCase}/follow-ups', [\App\Http\Controllers\TeacherCaseController::class, 'addFollowUp'])->name('teacher-cases.follow-ups.store');
         Route::post('/{teacherCase}/link-report', [\App\Http\Controllers\TeacherCaseController::class, 'linkReport'])->name('teacher-cases.link-report');
+        Route::post('/{teacherCase}/reassign', [\App\Http\Controllers\TeacherCaseController::class, 'reassignCase'])->name('teacher-cases.reassign');
         Route::get('/teacher/{teacher}/profile', [\App\Http\Controllers\TeacherCaseController::class, 'teacherProfile'])->name('teacher-cases.teacher-profile');
     });
 

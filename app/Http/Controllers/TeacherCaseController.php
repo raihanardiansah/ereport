@@ -298,4 +298,50 @@ class TeacherCaseController extends Controller
 
         return view('teacher-cases.profile', compact('teacher', 'cases', 'reports', 'stats'));
     }
+
+    /**
+     * Reassign case to a different handler.
+     */
+    public function reassignCase(Request $request, TeacherCase $teacherCase)
+    {
+        $user = auth()->user();
+
+        // Only admin and manajemen can reassign
+        if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah']) && !$user->isSuperAdmin()) {
+            abort(403);
+        }
+
+        if ($teacherCase->school_id !== $user->school_id && !$user->isSuperAdmin()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'handler_id' => ['required', 'exists:users,id'],
+        ]);
+
+        // Verify new handler is from same school and has appropriate role
+        $newHandler = User::where('id', $validated['handler_id'])
+            ->where('school_id', $teacherCase->school_id)
+            ->whereIn('role', ['admin_sekolah', 'manajemen_sekolah'])
+            ->first();
+
+        if (!$newHandler) {
+            return back()->withErrors(['handler_id' => 'Handler tidak valid atau tidak memiliki akses.']);
+        }
+
+        $oldHandlerId = $teacherCase->handler_id;
+        $teacherCase->update(['handler_id' => $validated['handler_id']]);
+
+        // Notify new handler
+        \App\Models\Notification::create([
+            'user_id' => $validated['handler_id'],
+            'school_id' => $teacherCase->school_id,
+            'type' => 'case_assigned',
+            'title' => 'Kasus Guru Ditugaskan',
+            'message' => "Anda ditugaskan untuk menangani kasus guru '{$teacherCase->title}'",
+            'data' => ['case_id' => $teacherCase->id],
+        ]);
+
+        return back()->with('success', 'Kasus berhasil ditugaskan ulang ke ' . $newHandler->name);
+    }
 }

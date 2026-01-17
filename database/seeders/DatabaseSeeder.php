@@ -56,7 +56,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'kepsek@sman1demo.sch.id',
             'username' => 'kepalasekolah',
             'password' => Hash::make('Password123!'),
-            'role' => 'kepala_sekolah',
+            'role' => 'manajemen_sekolah',
             'nip_nisn' => '198501012010011001',
             'email_verified_at' => now(),
         ]);
@@ -67,7 +67,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'gurubk@sman1demo.sch.id',
             'username' => 'gurubkdemo',
             'password' => Hash::make('Password123!'),
-            'role' => 'guru_bk',
+            'role' => 'staf_kesiswaan',
             'nip_nisn' => '199001012015012001',
             'email_verified_at' => now(),
         ]);

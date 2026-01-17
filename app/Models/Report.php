@@ -16,6 +16,7 @@ class Report extends Model
         'school_id',
         'user_id',
         'reported_user_id',
+        'assigned_to',
         'title',
         'content',
         'category',
@@ -69,6 +70,22 @@ class Report extends Model
     public function reportedUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reported_user_id');
+    }
+
+    /**
+     * Get the user assigned to handle this report.
+     */
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    /**
+     * Check if report is assigned to someone.
+     */
+    public function isAssigned(): bool
+    {
+        return $this->assigned_to !== null;
     }
 
     /**
