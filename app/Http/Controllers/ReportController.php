@@ -286,6 +286,20 @@ public function __construct(SentimentAnalysisService $sentimentService)
             $report->accusedUsers()->sync($accusedUserIds);
         }
 
+        // Send email notifications for CRITICAL reports (with rate limiting)
+        if ($report->urgency === 'critical') {
+            // Get admin count to calculate delays
+            $adminCount = \App\Models\User::where('school_id', $user->school_id)
+                ->whereIn('role', ['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])
+                ->whereNotNull('email')
+                ->count();
+
+            // Dispatch job with staggered delays (500ms between emails to respect 2 req/sec limit)
+            if ($adminCount > 0) {
+                \App\Jobs\SendCriticalReportEmail::dispatch($report, 0); // First email immediate
+            }
+        }
+
         // Send notifications to school admins and BK teachers
         Notification::notifyReportSubmitted($report);
         

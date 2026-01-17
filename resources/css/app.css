@@ -116,6 +116,53 @@
     animation: fade-in-up 0.6s ease-out forwards;
 }
 
+/* Skeleton Loading Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.skeleton {
+    @apply bg-gray-200 rounded animate-pulse;
+    background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.2) 20%,
+        rgba(255, 255, 255, 0.5) 60%,
+        rgba(255, 255, 255, 0)
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+.dark .skeleton {
+    @apply bg-gray-700;
+    background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.05) 20%,
+        rgba(255, 255, 255, 0.1) 60%,
+        rgba(255, 255, 255, 0)
+    );
+}
+
+.skeleton-text {
+    @apply skeleton h-4 w-full mb-2;
+}
+
+.skeleton-title {
+    @apply skeleton h-6 w-3/4 mb-3;
+}
+
+.skeleton-card {
+    @apply skeleton h-32 w-full;
+}
+
+
 /* ===== DARK MODE ===== */
 
 /* Dark mode color overrides */

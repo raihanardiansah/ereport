@@ -49,6 +49,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Midtrans Webhook (no auth required - called by Midtrans)
 Route::post('/webhook/midtrans', [\App\Http\Controllers\WebhookController::class, 'handle'])->name('webhook.midtrans');
 
+// API Routes (Authenticated)
+Route::middleware('auth')->prefix('api')->group(function () {
+    Route::get('/critical-reports/check', [\App\Http\Controllers\Api\CriticalReportController::class, 'check']);
+});
+
 
 // Protected Routes (Authenticated Users)
 Route::middleware(['auth', 'subscription'])->group(function () {

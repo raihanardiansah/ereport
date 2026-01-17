@@ -17,7 +17,8 @@
         }
     </script>
 </head>
-<body class="antialiased bg-gray-100 overflow-x-hidden">
+<body class="antialiased bg-gray-100 overflow-x-hidden" data-user-role="{{ auth()->user()->role }}">
+    <script src="{{ asset('js/notifications.js') }}" defer></script>
     <div id="google_translate_element" class="hidden"></div>
     <div class="min-h-screen flex">
         <!-- Sidebar -->
