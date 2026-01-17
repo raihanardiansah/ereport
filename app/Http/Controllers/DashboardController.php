@@ -27,9 +27,14 @@ class DashboardController extends Controller
         $stats = $this->getStats($user);
         $recentReports = $this->getRecentReports($user);
 
-        // Analytics Data
-        $reportTrends = $this->getReportTrends($user);
-        $categoryStats = $this->getCategoryStats($user);
+        // Analytics Data (Only for Admins/Management)
+        $reportTrends = [];
+        $categoryStats = [];
+
+        if ($user->hasAnyRole(['super_admin', 'admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])) {
+            $reportTrends = $this->getReportTrends($user);
+            $categoryStats = $this->getCategoryStats($user);
+        }
 
         return view('dashboard.index', compact('stats', 'recentReports', 'reportTrends', 'categoryStats'));
     }
@@ -85,12 +90,14 @@ class DashboardController extends Controller
         $query = Report::query();
 
         // Filter based on role
-        if (!$user->isSuperAdmin()) {
-            if ($user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])) {
-                $query->where('school_id', $user->school_id);
-            } else {
-                $query->where('user_id', $user->id);
-            }
+        if ($user->isSuperAdmin()) {
+            // SuperAdmin sees all
+        } elseif ($user->school_id) {
+            // All school users (Admin, Staff, Teacher, Student) see School-Wide Trends
+            $query->where('school_id', $user->school_id);
+        } else {
+            // Fallback
+            $query->where('user_id', $user->id);
         }
 
         $data = $query->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, count(*) as count")
@@ -121,12 +128,14 @@ class DashboardController extends Controller
         $query = Report::query();
 
         // Filter based on role
-        if (!$user->isSuperAdmin()) {
-            if ($user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])) {
-                $query->where('school_id', $user->school_id);
-            } else {
-                $query->where('user_id', $user->id);
-            }
+        if ($user->isSuperAdmin()) {
+            // SuperAdmin sees all
+        } elseif ($user->school_id) {
+            // All school users (Admin, Staff, Teacher, Student) see School-Wide Stats
+            $query->where('school_id', $user->school_id);
+        } else {
+            // Fallback for users without school (shouldn't happen)
+            $query->where('user_id', $user->id);
         }
 
         $allCategories = $query->selectRaw('category, count(*) as count')
@@ -134,29 +143,42 @@ class DashboardController extends Controller
             ->orderByDesc('count')
             ->get();
         
+        $total = $allCategories->sum('count');
+        if($total == 0) return [];
+
         // Take top 5
-        $topCategories = $allCategories->take(5);
-        
-        $labels = $topCategories->pluck('category')->map(function($cat) {
-            return ucfirst($cat);
-        })->toArray();
-        
-        $data = $topCategories->pluck('count')->toArray();
+        $stats = $allCategories->take(5)->map(function($item) use ($total) {
+            return [
+                'label' => ucfirst($item->category),
+                'count' => $item->count,
+                'percentage' => round(($item->count / $total) * 100, 1),
+                'color' => $this->getCategoryColor($item->category)
+            ];
+        });
 
         // Group the rest as "Lainnya"
         $otherCount = $allCategories->slice(5)->sum('count');
         if ($otherCount > 0) {
-            $labels[] = 'Lainnya';
-            $data[] = $otherCount;
+            $stats->push([
+                'label' => 'Lainnya',
+                'count' => $otherCount,
+                'percentage' => round(($otherCount / $total) * 100, 1),
+                'color' => 'gray'
+            ]);
         }
 
-        // If no data, return empty structures with a placeholder usually handled in frontend,
-        // but for Chart.js we can return empty arrays or default
-        if (empty($data)) {
-            return ['labels' => ['Belum ada data'], 'data' => [0]];
-        }
+        return $stats->toArray();
+    }
 
-        return ['labels' => $labels, 'data' => $data];
+    private function getCategoryColor($category)
+    {
+        return match(strtolower($category)) {
+            'perilaku', 'bullying', 'keamanan' => 'red',
+            'akademik', 'prestasi' => 'blue',
+            'fasilitas', 'kebersihan', 'teknologi' => 'orange',
+            'kehealthan', 'kantin' => 'green',
+            default => 'gray'
+        };
     }
 
     /**

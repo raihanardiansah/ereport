@@ -119,6 +119,7 @@
     </div>
 
     <!-- Analytics Charts -->
+    @if(!empty($reportTrends) && !empty($categoryStats))
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <!-- Monthly Trends -->
         <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
@@ -129,17 +130,49 @@
         </div>
 
         <!-- Categories Distribution -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Kategori Laporan</h3>
-            <div class="relative h-72 w-full flex items-center justify-center">
-                <canvas id="categoriesChart"></canvas>
-            </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Kategori Terbanyak</h3>
+            
+            @if(empty($categoryStats))
+                <div class="flex-1 flex flex-col items-center justify-center text-center text-gray-500 min-h-[200px]">
+                    <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                    </svg>
+                    <p>Belum ada data</p>
+                </div>
+            @else
+                <div class="space-y-4 flex-1 overflow-y-auto pr-2 max-h-[300px]">
+                    @foreach($categoryStats as $stat)
+                    <div class="group">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary-600 transition-colors">{{ $stat['label'] }}</span>
+                            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{{ $stat['count'] }} Laporan ({{ $stat['percentage'] }}%)</span>
+                        </div>
+                        <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                            <div class="h-2.5 rounded-full transition-all duration-500 ease-out 
+                                @if($stat['color'] === 'red') bg-red-500
+                                @elseif($stat['color'] === 'green') bg-green-500
+                                @elseif($stat['color'] === 'blue') bg-blue-500
+                                @elseif($stat['color'] === 'orange') bg-orange-500
+                                @else bg-gray-500 @endif
+                            " style="width: {{ $stat['percentage'] }}%"></div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
+    @endif
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if chart element exists
+            const trendsChart = document.getElementById('trendsChart');
+            if (!trendsChart) return;
+
             // Dark mode check
             const isDark = document.documentElement.classList.contains('dark');
             const textColor = isDark ? '#9CA3AF' : '#4B5563';
@@ -213,37 +246,8 @@
                 }
             });
 
-            // Categories Chart
-            const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
-            new Chart(categoriesCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: @json($categoryStats['labels']),
-                    datasets: [{
-                        data: @json($categoryStats['data']),
-                        backgroundColor: [
-                            '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#6B7280'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                usePointStyle: true,
-                                color: textColor,
-                                padding: 20
-                            }
-                        }
-                    }
-                }
-            });
+            
+            /* Categories Chart Removed - Replaced with List View */
         });
     </script>
 
