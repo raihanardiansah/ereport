@@ -4,13 +4,13 @@ class ReportNotificationManager {
         this.permission = Notification.permission;
         this.checkInterval = 30000; // Check every 30 seconds
         this.lastCheckTime = null;
-        this.isAdmin = document.body.dataset.userRole && 
-                       ['super_admin', 'admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'].includes(document.body.dataset.userRole);
+        this.isAdmin = document.body.dataset.userRole &&
+            ['super_admin', 'admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'].includes(document.body.dataset.userRole);
     }
 
     async init() {
         if (!this.isAdmin) return;
-        
+
         // Request permission if not granted
         if (this.permission === 'default') {
             await this.requestPermission();
@@ -26,7 +26,7 @@ class ReportNotificationManager {
         try {
             const permission = await Notification.requestPermission();
             this.permission = permission;
-            
+
             if (permission === 'granted') {
                 this.showWelcomeNotification();
             }
@@ -45,7 +45,13 @@ class ReportNotificationManager {
 
     async checkForCriticalReports() {
         try {
-            const response = await fetch('/api/critical-reports/check', {
+            // Use lastCheckTime or default to 1 minute ago if null
+            const since = this.lastCheckTime || new Date(Date.now() - 60000).toISOString();
+
+            // Update lastCheckTime BEFORE the call to avoid missing reports during the call
+            const now = new Date().toISOString();
+
+            const response = await fetch(`/api/critical-reports/check?since=${encodeURIComponent(since)}`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json'
@@ -55,7 +61,10 @@ class ReportNotificationManager {
             if (!response.ok) return;
 
             const data = await response.json();
-            
+
+            // Only update last check time if request was successful
+            this.lastCheckTime = now;
+
             if (data.hasNew && data.reports && data.reports.length > 0) {
                 data.reports.forEach(report => {
                     this.showCriticalReportNotification(report);

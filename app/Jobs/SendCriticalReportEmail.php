@@ -17,15 +17,17 @@ class SendCriticalReportEmail implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public Report $report;
+    public User $recipient;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(Report $report, int $initialDelay = 0)
+    public function __construct(Report $report, User $recipient, int $initialDelay = 0)
     {
         $this->report = $report;
+        $this->recipient = $recipient;
         
-        // Set queue delay to respect rate limit (500ms between emails)
+        // Set queue delay to respect rate limit
         if ($initialDelay > 0) {
             $this->delay($initialDelay);
         }
@@ -36,25 +38,14 @@ class SendCriticalReportEmail implements ShouldQueue
      */
     public function handle(): void
     {
-        // Get all admin users from the same school
-        $adminRoles = ['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'];
-        
-        $admins = User::where('school_id', $this->report->school_id)
-            ->whereIn('role', $adminRoles)
-            ->whereNotNull('email')
-            ->get();
-
-        // Send email to each admin
-        foreach ($admins as $admin) {
-            try {
-                Mail::to($admin->email)->send(new CriticalReportCreated($this->report));
-            } catch (\Exception $e) {
-                \Log::error('Failed to send critical report email', [
-                    'report_id' => $this->report->id,
-                    'admin_email' => $admin->email,
-                    'error' => $e->getMessage()
-                ]);
-            }
+        try {
+            Mail::to($this->recipient->email)->send(new CriticalReportCreated($this->report));
+        } catch (\Exception $e) {
+            \Log::error('Failed to send critical report email', [
+                'report_id' => $this->report->id,
+                'recipient_email' => $this->recipient->email,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 

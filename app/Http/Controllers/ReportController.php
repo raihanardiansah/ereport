@@ -288,15 +288,17 @@ public function __construct(SentimentAnalysisService $sentimentService)
 
         // Send email notifications for CRITICAL reports (with rate limiting)
         if ($report->urgency === 'critical') {
-            // Get admin count to calculate delays
-            $adminCount = \App\Models\User::where('school_id', $user->school_id)
+            // Get admins
+            $admins = \App\Models\User::where('school_id', $user->school_id)
                 ->whereIn('role', ['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])
                 ->whereNotNull('email')
-                ->count();
+                ->get();
 
-            // Dispatch job with staggered delays (500ms between emails to respect 2 req/sec limit)
-            if ($adminCount > 0) {
-                \App\Jobs\SendCriticalReportEmail::dispatch($report, 0); // First email immediate
+            // Dispatch job with staggered delays (2 seconds between emails to be safe with Resend)
+            foreach ($admins as $index => $admin) {
+                // Delay: 0s, 2s, 4s, 6s...
+                $delay = $index * 2; 
+                \App\Jobs\SendCriticalReportEmail::dispatch($report, $admin, $delay);
             }
         }
 
