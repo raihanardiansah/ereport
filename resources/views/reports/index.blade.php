@@ -96,6 +96,18 @@
                                 @else bg-gray-100 text-gray-700 @endif">
                                 {{ ucfirst($report->status) }}
                             </span>
+                            
+                            <!-- Urgency Badge -->
+                            @if($report->urgency === 'critical')
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-red-600 text-white shrink-0 animate-pulse">
+                                    🚨 KRITIS
+                                </span>
+                            @elseif($report->urgency === 'high')
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-orange-100 text-orange-800 shrink-0">
+                                    ⚠️ TINGGI
+                                </span>
+                            @endif
+
                             @if($report->isEscalated())
                                 {!! $report->escalation_badge !!}
                             @endif
@@ -165,6 +177,18 @@
                             @else bg-gray-100 text-gray-700 @endif">
                             {{ ucfirst($report->status) }}
                         </span>
+                        
+                        <!-- Urgency Badge Mobile -->
+                        @if($report->urgency === 'critical')
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-red-600 text-white animate-pulse">
+                                🚨
+                            </span>
+                        @elseif($report->urgency === 'high')
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-orange-100 text-orange-800">
+                                ⚠️
+                            </span>
+                        @endif
+
                         @php $classification = $report->manual_classification ?? $report->ai_classification; @endphp
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
                             @if($classification === 'positif') bg-green-100 text-green-700

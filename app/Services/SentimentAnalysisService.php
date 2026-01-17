@@ -125,7 +125,7 @@ class SentimentAnalysisService
     }
 
     /**
-     * Build prompt for FULL analysis (title + sentiment + category).
+     * Build prompt for FULL analysis (title + sentiment + category + urgency).
      */
     protected function buildFullPrompt(string $content): string
     {
@@ -135,8 +135,12 @@ Anda adalah sistem AI untuk menganalisis laporan di sekolah Indonesia.
 Analisis laporan berikut dan berikan:
 1. **Judul**: Buat judul singkat (5-7 kata) yang merangkum inti laporan. Jangan awali dengan "Laporan" atau "Tentang".
 2. **Sentimen**: positif/negatif/netral
-3. **Kategori**: Pilih SATU dari: perilaku, akademik, kehadiran, bullying, konseling, kesehatan, fasilitas, prestasi, keamanan, ekstrakurikuler, sosial, keuangan, kebersihan, kantin, transportasi, teknologi, guru, kurikulum, perpustakaan, laboratorium, olahraga, keagamaan, saran, lainnya
-4. **Confidence**: 0.0-1.0
+3. **Kategori**: Pilih SATU dari: [perilaku, akademik, kehadiran, bullying, konseling, kesehatan, fasilitas, prestasi, keamanan, ekstrakurikuler, sosial, keuangan, kebersihan, kantin, transportasi, teknologi, guru, kurikulum, perpustakaan, laboratorium, olahraga, keagamaan, saran, lainnya]
+4. **Urgency**: Tentukan tingkat urgensi:
+   - **critical**: JIKA mengandung ancaman nyawa, bunuh diri, senjata tajam, narkoba, kebakaran, kekerasan fisik berat, pelecehan seksual.
+   - **high**: JIKA mengandung bullying verbal parah, pencurian, perkelahian, merokok, bolos massal, kerusakan fasilitas berbahaya.
+   - **normal**: Laporan informasi biasa, saran, kehilangan barang kecil, keluhan ringan.
+5. **Confidence**: 0.0-1.0
 
 ---
 ISI LAPORAN:
@@ -144,12 +148,12 @@ ISI LAPORAN:
 ---
 
 Berikan jawaban dalam format JSON (HANYA JSON, tanpa teks lain):
-{"title": "Judul Singkat Disini", "sentiment": "positif|negatif|netral", "category": "kategori", "confidence": 0.9}
+{"title": "Judul Singkat Disini", "sentiment": "positif|negatif|netral", "category": "kategori", "urgency": "normal|high|critical", "confidence": 0.9}
 PROMPT;
     }
 
     /**
-     * Parse full response including title.
+     * Parse full response including title and urgency.
      */
     protected function parseFullResponse(array $result, string $content): array
     {
@@ -191,12 +195,19 @@ PROMPT;
                 $category = 'lainnya';
             }
 
+            // Validate urgency
+            $urgency = strtolower($parsed['urgency'] ?? 'normal');
+            if (!in_array($urgency, ['normal', 'high', 'critical'])) {
+                $urgency = 'normal';
+            }
+
             $confidence = floatval($parsed['confidence'] ?? 0.5);
 
             return [
                 'title' => $title,
                 'sentiment' => $sentiment,
                 'category' => $category,
+                'urgency' => $urgency,
                 'confidence' => min(1.0, max(0.0, $confidence)),
             ];
 

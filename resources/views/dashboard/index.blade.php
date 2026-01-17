@@ -4,6 +4,43 @@
         <p class="text-gray-600 dark:text-gray-400 mt-1">Selamat datang, {{ auth()->user()->name }}!</p>
     </div>
 
+    <!-- Emergency Triage Alert -->
+    @php
+        $criticalReports = \App\Models\Report::where('urgency', 'critical')
+            ->whereIn('status', ['dikirim', 'diproses', 'ditindaklanjuti'])
+            ->when(!auth()->user()->isSuperAdmin() && auth()->user()->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']), function($q) {
+                return $q->where('school_id', auth()->user()->school_id);
+            })
+            ->get();
+    @endphp
+
+    @if($criticalReports->count() > 0 && auth()->user()->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan', 'super_admin']))
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg animate-pulse">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">
+                    PERHATIAN: {{ $criticalReports->count() }} Laporan Urgent Terdeteksi!
+                </h3>
+                <div class="mt-2 text-sm text-red-700">
+                    <p>Sistem AI mendeteksi laporan dengan tingkat urgensi KRITIS (Ancaman nyawa/Kekerasan/Napza). Segera tindak lanjuti.</p>
+                </div>
+                <div class="mt-4">
+                    <div class="-mx-2 -my-1.5 flex">
+                        <a href="{{ route('reports.index', ['urgency' => 'critical']) }}" class="px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Lihat Laporan Kritis &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Reports -->

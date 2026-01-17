@@ -30,6 +30,7 @@ class Report extends Model
         'escalation_level',
         'is_anonymous',
         'device_fingerprint',
+        'urgency',
     ];
 
     protected $casts = [

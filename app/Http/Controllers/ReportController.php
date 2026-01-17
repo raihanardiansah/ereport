@@ -101,7 +101,6 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function create()
     {
         $user = auth()->user();
-        $templates = \App\Models\ReportTemplate::forSchool($user->school_id);
         
         // Get reportable users based on the reporter's role
         // Student: can report other students, teachers, staf_kesiswaan
@@ -116,7 +115,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
             ->orderBy('name')
             ->get(['id', 'name', 'role']);
         
-        return view('reports.create', compact('templates', 'reportableUsers'));
+        return view('reports.create', compact('reportableUsers'));
     }
 
     /**
@@ -255,9 +254,10 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'attachment_path' => $attachmentPath,
             'ai_classification' => $aiResult['sentiment'],
             'ai_category' => $aiResult['category'],
+            'urgency' => $aiResult['urgency'] ?? 'normal', // Save urgency
             'status' => 'dikirim',
-            'is_anonymous' => $isAnonymous,
-            'device_fingerprint' => $isAnonymous ? $deviceFingerprint : null,
+            'is_anonymous' => $validated['is_anonymous'] ?? false,
+            'device_fingerprint' => $validated['device_fingerprint'] ?? null,
         ]);
 
         // Increment rate limit counter if anonymous
