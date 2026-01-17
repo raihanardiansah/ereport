@@ -17,19 +17,17 @@ class SendCriticalReportEmail implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public Report $report;
-    public int $delay = 0;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(Report $report, int $delay = 0)
+    public function __construct(Report $report, int $initialDelay = 0)
     {
         $this->report = $report;
-        $this->delay = $delay;
         
         // Set queue delay to respect rate limit (500ms between emails)
-        if ($delay > 0) {
-            $this->delay($delay);
+        if ($initialDelay > 0) {
+            $this->delay($initialDelay);
         }
     }
 
