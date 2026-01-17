@@ -297,7 +297,7 @@
                     </div>
 
                     <!-- Reassign Form -->
-                    <form method="POST" action="{{ route('reports.assign', $report) }}" class="space-y-3">
+                    <form method="POST" action="{{ route('reports.assign', $report) }}" class="space-y-3 mb-3">
                         @csrf
                         <div>
                             <label class="block text-sm text-gray-600 mb-2">Tugaskan ulang ke:</label>
@@ -315,18 +315,18 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="flex gap-2">
-                            <button type="submit" class="flex-1 px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors">
-                                Tugaskan Ulang
-                            </button>
-                            <form method="POST" action="{{ route('reports.unassign', $report) }}" class="flex-1">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="w-full px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
-                                    Hapus Penugasan
-                                </button>
-                            </form>
-                        </div>
+                        <button type="submit" class="w-full px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors">
+                            Tugaskan Ulang
+                        </button>
+                    </form>
+
+                    <!-- Unassign Form -->
+                    <form method="POST" action="{{ route('reports.unassign', $report) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="w-full px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+                            Hapus Penugasan
+                        </button>
                     </form>
                 @else
                     <!-- Not Assigned - Assign Form -->

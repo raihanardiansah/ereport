@@ -118,14 +118,14 @@
     <!-- Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
+            <div class="flex justify-between items-center h-20 relative">
                 <!-- Logo -->
                 <div class="flex items-center">
                     <img src="https://i.ibb.co.com/bgHHDbVR/Logo-1-1.png" alt="Logo" class="h-11">
                 </div>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-8">
+                <div class="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
                     <a href="#home" class="text-gray-300 hover:text-white font-medium transition-colors">Home</a>
                     <a href="#features" class="text-gray-300 hover:text-white font-medium transition-colors">Fitur</a>
                     <a href="#pricing" class="text-gray-300 hover:text-white font-medium transition-colors">Harga</a>
