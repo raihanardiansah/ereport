@@ -42,15 +42,19 @@ class ProfileController extends Controller
 
         // Handle Avatar Upload
         if ($request->hasFile('avatar')) {
-            $compressionService = new \App\Services\ImageCompressionService();
-            $path = $compressionService->compressAndSaveAvatar($request->file('avatar'));
+            try {
+                $compressionService = new \App\Services\ImageCompressionService();
+                $path = $compressionService->compressAndSaveAvatar($request->file('avatar'));
 
-            // Delete old avatar if exists
-            if ($user->avatar_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar_path);
+                // Delete old avatar if exists
+                if ($user->avatar_path) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar_path);
+                }
+
+                $user->avatar_path = $path;
+            } catch (\Exception $e) {
+                return back()->withErrors(['avatar' => 'Gagal memproses foto: ' . $e->getMessage()])->withInput();
             }
-
-            $user->avatar_path = $path;
         }
 
         $user->save();

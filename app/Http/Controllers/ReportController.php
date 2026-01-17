@@ -12,6 +12,8 @@ use App\Services\SentimentAnalysisService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+use App\Services\ImageCompressionService;
 
 class ReportController extends Controller
 {
@@ -150,7 +152,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
                 'nullable',
                 'file',
                 'mimes:jpg,jpeg,png,pdf',
-                'max:3072', // 3MB
+                'max:10240', // 10MB (Images will be compressed)
             ],
             'is_anonymous' => ['nullable', 'boolean'],
             'device_fingerprint' => ['nullable', 'string', 'max:64'],
@@ -159,7 +161,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'content.min' => 'Isi laporan minimal 20 karakter.',
             'content.max' => 'Isi laporan maksimal 2000 karakter.',
             'attachment.mimes' => 'File harus JPG, PNG, atau PDF.',
-            'attachment.max' => 'Ukuran file maksimal 3MB.',
+            'attachment.max' => 'Ukuran file maksimal 10MB.',
         ]);
 
         // Handle anonymous reporting with rate limiting
@@ -197,10 +199,29 @@ public function __construct(SentimentAnalysisService $sentimentService)
         // Handle file upload
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store(
-                'reports/' . $user->school_id,
-                'public'
-            );
+            $file = $request->file('attachment');
+            $mime = $file->getMimeType();
+
+            // Handle Image Compression
+            if (Str::startsWith($mime, 'image/')) {
+                try {
+                    // Compress image (max 1280x1280, quality 80%)
+                    $attachmentPath = app(ImageCompressionService::class)
+                        ->compressAndSaveImage($file, 'reports/' . $user->school_id, 1280, 1280, 80);
+                } catch (\Exception $e) {
+                    return back()->withErrors(['attachment' => 'Gagal memproses gambar: ' . $e->getMessage()])->withInput();
+                }
+            } else {
+                // For PDF, keep strict 3MB limit
+                if ($file->getSize() > 3072 * 1024) {
+                     return back()->withErrors(['attachment' => 'Ukuran file PDF maksimal 3MB.'])->withInput();
+                }
+
+                $attachmentPath = $file->store(
+                    'reports/' . $user->school_id,
+                    'public'
+                );
+            }
         }
 
         // Use Google Gemini AI for FULL analysis (title + sentiment + category) in ONE call
