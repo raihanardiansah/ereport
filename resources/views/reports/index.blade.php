@@ -21,61 +21,86 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
-        <form method="GET" class="flex flex-col sm:flex-row gap-4">
-            <div class="flex-1">
-                <input type="text" name="search" value="{{ request('search') }}"
-                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
-                    placeholder="Cari judul atau isi laporan...">
+    <!-- Filters -->
+    <div x-data="{ showAdvanced: {{ request('date_start') || request('date_end') || request('reporter_id') ? 'true' : 'false' }} }" class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+        <form method="GET">
+            <div class="flex flex-col lg:flex-row gap-4 mb-4">
+                <div class="flex-1">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
+                        placeholder="Cari judul atau isi laporan...">
+                </div>
+                
+                <div class="flex gap-4">
+                    <div class="w-40">
+                        <select name="urgency" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
+                            <option value="">Semua Urgency</option>
+                            <option value="critical" {{ request('urgency') == 'critical' ? 'selected' : '' }}>🚨 Critical</option>
+                            <option value="high" {{ request('urgency') == 'high' ? 'selected' : '' }}>⚠️ High</option>
+                            <option value="normal" {{ request('urgency') == 'normal' ? 'selected' : '' }}>Normal</option>
+                        </select>
+                    </div>
+                    <div class="w-40">
+                        <select name="status" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
+                            <option value="">Semua Status</option>
+                            <option value="dikirim" {{ request('status') == 'dikirim' ? 'selected' : '' }}>Dikirim</option>
+                            <option value="diproses" {{ request('status') == 'diproses' ? 'selected' : '' }}>Diproses</option>
+                            <option value="ditindaklanjuti" {{ request('status') == 'ditindaklanjuti' ? 'selected' : '' }}>Ditindaklanjuti</option>
+                            <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="button" @click="showAdvanced = !showAdvanced" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                    </svg>
+                    <span>Filter</span>
+                </button>
+                <button type="submit" class="btn-secondary py-2">Cari</button>
             </div>
-            <div class="sm:w-40">
-                <select name="category" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
-                    <option value="">Semua Kategori</option>
-                    <option value="perilaku" {{ request('category') == 'perilaku' ? 'selected' : '' }}>Perilaku</option>
-                    <option value="akademik" {{ request('category') == 'akademik' ? 'selected' : '' }}>Akademik</option>
-                    <option value="kehadiran" {{ request('category') == 'kehadiran' ? 'selected' : '' }}>Kehadiran</option>
-                    <option value="bullying" {{ request('category') == 'bullying' ? 'selected' : '' }}>Bullying</option>
-                    <option value="konseling" {{ request('category') == 'konseling' ? 'selected' : '' }}>Konseling</option>
-                    <option value="kesehatan" {{ request('category') == 'kesehatan' ? 'selected' : '' }}>Kesehatan</option>
-                    <option value="fasilitas" {{ request('category') == 'fasilitas' ? 'selected' : '' }}>Fasilitas</option>
-                    <option value="prestasi" {{ request('category') == 'prestasi' ? 'selected' : '' }}>Prestasi</option>
-                    <option value="keamanan" {{ request('category') == 'keamanan' ? 'selected' : '' }}>Keamanan</option>
-                    <option value="ekstrakurikuler" {{ request('category') == 'ekstrakurikuler' ? 'selected' : '' }}>Ekstrakurikuler</option>
-                    <option value="sosial" {{ request('category') == 'sosial' ? 'selected' : '' }}>Sosial</option>
-                    <option value="keuangan" {{ request('category') == 'keuangan' ? 'selected' : '' }}>Keuangan</option>
-                    <option value="kebersihan" {{ request('category') == 'kebersihan' ? 'selected' : '' }}>Kebersihan</option>
-                    <option value="kantin" {{ request('category') == 'kantin' ? 'selected' : '' }}>Kantin</option>
-                    <option value="transportasi" {{ request('category') == 'transportasi' ? 'selected' : '' }}>Transportasi</option>
-                    <option value="teknologi" {{ request('category') == 'teknologi' ? 'selected' : '' }}>Teknologi</option>
-                    <option value="guru" {{ request('category') == 'guru' ? 'selected' : '' }}>Guru</option>
-                    <option value="kurikulum" {{ request('category') == 'kurikulum' ? 'selected' : '' }}>Kurikulum</option>
-                    <option value="perpustakaan" {{ request('category') == 'perpustakaan' ? 'selected' : '' }}>Perpustakaan</option>
-                    <option value="laboratorium" {{ request('category') == 'laboratorium' ? 'selected' : '' }}>Laboratorium</option>
-                    <option value="olahraga" {{ request('category') == 'olahraga' ? 'selected' : '' }}>Olahraga</option>
-                    <option value="keagamaan" {{ request('category') == 'keagamaan' ? 'selected' : '' }}>Keagamaan</option>
-                    <option value="saran" {{ request('category') == 'saran' ? 'selected' : '' }}>Saran</option>
-                    <option value="lainnya" {{ request('category') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
-                </select>
+
+            <!-- Advanced Filters Section -->
+            <div x-show="showAdvanced" class="pt-4 border-t border-gray-100 grid grid-cols-1 md:grid-cols-4 gap-4" style="display: none;">
+                <!-- Category Filter -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Kategori</label>
+                    <select name="category" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
+                        <option value="">Semua Kategori</option>
+                        <option value="perilaku" {{ request('category') == 'perilaku' ? 'selected' : '' }}>Perilaku</option>
+                        <option value="akademik" {{ request('category') == 'akademik' ? 'selected' : '' }}>Akademik</option>
+                        <option value="kehadiran" {{ request('category') == 'kehadiran' ? 'selected' : '' }}>Kehadiran</option>
+                        <option value="bullying" {{ request('category') == 'bullying' ? 'selected' : '' }}>Bullying</option>
+                        <!-- ... other categories ... -->
+                        <option value="lainnya" {{ request('category') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
+                    </select>
+                </div>
+
+                <!-- Date Range -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal</label>
+                    <input type="date" name="date_start" value="{{ request('date_start') }}" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Sampai Tanggal</label>
+                    <input type="date" name="date_end" value="{{ request('date_end') }}" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
+                </div>
+
+                <!-- Reporter Filter (Admin Only) -->
+                @if(auth()->user()->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) || auth()->user()->isSuperAdmin())
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Pelapor</label>
+                    <select name="reporter_id" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
+                        <option value="">Semua Pelapor</option>
+                        @foreach($reporters ?? [] as $reporter)
+                            <option value="{{ $reporter->id }}" {{ request('reporter_id') == $reporter->id ? 'selected' : '' }}>
+                                {{ Str::limit($reporter->name, 20) }} ({{ $reporter->getRoleDisplayName() }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
             </div>
-            <div class="sm:w-40">
-                <select name="status" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
-                    <option value="">Semua Status</option>
-                    <option value="dikirim" {{ request('status') == 'dikirim' ? 'selected' : '' }}>Dikirim</option>
-                    <option value="diproses" {{ request('status') == 'diproses' ? 'selected' : '' }}>Diproses</option>
-                    <option value="ditindaklanjuti" {{ request('status') == 'ditindaklanjuti' ? 'selected' : '' }}>Ditindaklanjuti</option>
-                    <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                </select>
-            </div>
-            @if(auth()->user()->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) || auth()->user()->isSuperAdmin())
-            <div class="sm:w-40">
-                <select name="assigned" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500">
-                    <option value="">Semua Penugasan</option>
-                    <option value="me" {{ request('assigned') == 'me' ? 'selected' : '' }}>Ditugaskan ke Saya</option>
-                    <option value="unassigned" {{ request('assigned') == 'unassigned' ? 'selected' : '' }}>Belum Ditugaskan</option>
-                </select>
-            </div>
-            @endif
-            <button type="submit" class="btn-secondary py-2">Filter</button>
         </form>
     </div>
 

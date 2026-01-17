@@ -165,7 +165,8 @@
         </div>
     </div>
     @endif
-
+    
+    @if(!empty($reportTrends) && !empty($categoryStats))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -250,6 +251,8 @@
             /* Categories Chart Removed - Replaced with List View */
         });
     </script>
+    @endif
+
 
     <div class="grid lg:grid-cols-3 gap-6">
         <!-- Recent Reports -->

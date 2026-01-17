@@ -79,15 +79,30 @@ public function __construct(SentimentAnalysisService $sentimentService)
             $query->where('status', $request->status);
         }
 
-        // Assignment filter
-        if ($request->filled('assigned')) {
-            if ($request->assigned === 'me') {
-                $query->where('assigned_to', $user->id);
-            } elseif ($request->assigned === 'unassigned') {
-                $query->whereNull('assigned_to');
-            } elseif (is_numeric($request->assigned)) {
-                $query->where('assigned_to', $request->assigned);
-            }
+        // Filter by assigned to me
+        if ($request->filled('assigned') && $request->assigned === 'me') {
+            $query->where('assigned_to', $user->id);
+        } elseif ($request->filled('assigned') && $request->assigned === 'unassigned') {
+            $query->whereNull('assigned_to');
+        }
+
+        // Advanced Filters
+        // 1. Urgency Filter
+        if ($request->filled('urgency')) {
+            $query->where('urgency', $request->urgency);
+        }
+
+        // 2. Date Range Filter
+        if ($request->filled('date_start')) {
+            $query->whereDate('created_at', '>=', $request->date_start);
+        }
+        if ($request->filled('date_end')) {
+            $query->whereDate('created_at', '<=', $request->date_end);
+        }
+
+        // 3. Reporter Filter (Admin Only)
+        if ($request->filled('reporter_id') && $user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan', 'super_admin'])) {
+            $query->where('user_id', $request->reporter_id);
         }
 
         $reports = $query->latest()->paginate(10);
