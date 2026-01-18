@@ -26,6 +26,7 @@ class User extends Authenticatable
         'current_streak',
         'last_activity_date',
         'avatar_path',
+        'is_approved',
     ];
 
     protected $hidden = [
