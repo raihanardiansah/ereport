@@ -37,14 +37,30 @@
             document.documentElement.classList.add('dark');
         }
     </script>
+    <style>
+        /* Custom Scrollbar for Sidebar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #374151; /* gray-700 */
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #4b5563; /* gray-600 */
+        }
+    </style>
 </head>
 <body class="antialiased bg-gray-100 overflow-x-hidden" data-user-role="{{ auth()->user()->role }}">
     <div id="google_translate_element" class="hidden"></div>
     <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col">
             <!-- Logo -->
-            <div class="h-16 flex items-center px-6 border-b border-gray-800">
+            <div class="h-16 flex items-center px-6 border-b border-gray-800 flex-shrink-0">
                 <a href="/" class="flex items-center">
                     <img src="https://i.ibb.co.com/bgHHDbVR/Logo-1-1.png" alt="Logo" class="h-9">
                 </a>
@@ -52,7 +68,7 @@
 
 
             <!-- Navigation -->
-            <nav class="mt-6 px-4">
+            <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
                 @php
                     $subscriptionExpired = session('subscription_expired') && auth()->user()->role !== 'admin_sekolah';
                 @endphp

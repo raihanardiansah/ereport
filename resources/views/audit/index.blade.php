@@ -52,7 +52,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    @forelse($logs as $log)
+                    @forelse($auditLogs as $log)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 text-gray-500">
                             {{ $log->created_at->format('d M Y H:i:s') }}
@@ -107,9 +107,9 @@
             </table>
         </div>
         
-        @if($logs->hasPages())
+        @if($auditLogs->hasPages())
         <div class="px-6 py-4 border-t border-gray-100">
-            {{ $logs->links() }}
+            {{ $auditLogs->links() }}
         </div>
         @endif
     </div>
