@@ -753,7 +753,7 @@
     @include('partials.chat-widget')
     
     <!-- PWA Install Prompt -->
-    <div id="pwa-install-prompt" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 transform translate-y-full transition-transform duration-300 z-[9999] pointer-events-auto">
+    <div id="pwa-install-prompt" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 z-[99999]" style="pointer-events: auto !important;">
         <div class="flex items-start gap-3">
             <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -764,15 +764,15 @@
                 <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Install e-Report</h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Install aplikasi untuk akses lebih cepat dan notifikasi real-time</p>
                 <div class="flex gap-2">
-                    <button type="button" onclick="installPWA()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer">
+                    <button id="pwa-install-btn" type="button" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer">
                         Install
                     </button>
-                    <button type="button" onclick="dismissInstallPrompt()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg transition-colors cursor-pointer">
+                    <button id="pwa-dismiss-btn" type="button" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg transition-colors cursor-pointer">
                         Nanti
                     </button>
                 </div>
             </div>
-            <button type="button" onclick="dismissInstallPrompt()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">
+            <button id="pwa-close-btn" type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -808,11 +808,16 @@
             });
         }
 
+
         // PWA Install Prompt
         let deferredPrompt;
         const installPrompt = document.getElementById('pwa-install-prompt');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss-btn');
+        const closeBtn = document.getElementById('pwa-close-btn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('[PWA] Install prompt available');
             e.preventDefault();
             deferredPrompt = e;
             
@@ -824,31 +829,73 @@
             // Show prompt if not dismissed or dismissed more than 7 days ago
             if (!dismissed || daysSinceDismissed > 7) {
                 setTimeout(() => {
-                    installPrompt.classList.remove('translate-y-full');
+                    if (installPrompt) {
+                        installPrompt.classList.remove('hidden');
+                        console.log('[PWA] Showing install prompt');
+                    }
                 }, 3000); // Show after 3 seconds
             }
         });
 
-        async function installPWA() {
-            if (!deferredPrompt) {
-                return;
-            }
+        // Install button click
+        if (installBtn) {
+            installBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[PWA] Install button clicked');
+                
+                if (!deferredPrompt) {
+                    console.log('[PWA] No deferred prompt available');
+                    showToast('Install prompt tidak tersedia. Coba refresh halaman.', 'error');
+                    return;
+                }
 
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            
-            if (outcome === 'accepted') {
-                console.log('[PWA] User accepted install');
-                showToast('Aplikasi berhasil diinstall!', 'success');
-            }
-            
-            deferredPrompt = null;
-            installPrompt.classList.add('translate-y-full');
+                try {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    
+                    console.log('[PWA] User choice:', outcome);
+                    
+                    if (outcome === 'accepted') {
+                        showToast('Aplikasi berhasil diinstall!', 'success');
+                    } else {
+                        showToast('Install dibatalkan', 'info');
+                    }
+                    
+                    deferredPrompt = null;
+                    if (installPrompt) {
+                        installPrompt.classList.add('hidden');
+                    }
+                } catch (error) {
+                    console.error('[PWA] Install error:', error);
+                    showToast('Gagal install aplikasi', 'error');
+                }
+            });
         }
 
+        // Dismiss button click
         function dismissInstallPrompt() {
-            installPrompt.classList.add('translate-y-full');
+            console.log('[PWA] Dismissing install prompt');
+            if (installPrompt) {
+                installPrompt.classList.add('hidden');
+            }
             localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+        }
+
+        if (dismissBtn) {
+            dismissBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dismissInstallPrompt();
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dismissInstallPrompt();
+            });
         }
 
         // Detect if running as PWA
