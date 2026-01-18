@@ -426,7 +426,13 @@ public function __construct(SentimentAnalysisService $sentimentService)
             ]);
             
             // Send email notification
-            EmailService::notifyReportStatusChanged($report, $oldStatus, $validated['status']);
+            if ($validated['status'] === 'selesai') {
+                // If closed, send detailed summary email instead of generic status update
+                EmailService::notifyReportClosed($report);
+            } else {
+                // Send standard status update email
+                EmailService::notifyReportStatusChanged($report, $oldStatus, $validated['status']);
+            }
         }
 
         // Audit log for critical/high reports

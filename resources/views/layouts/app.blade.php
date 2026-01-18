@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="e-Report">
+    <meta name="description" content="Platform pelaporan digital untuk sekolah dengan AI-powered sentiment analysis">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-192x192.png">
+    
     <title>{{ $title ?? 'Dashboard' }} - e-Report</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -730,6 +751,127 @@
     </script>
     
     @include('partials.chat-widget')
+    
+    <!-- PWA Install Prompt -->
+    <div id="pwa-install-prompt" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 transform translate-y-full transition-transform duration-300 z-50">
+        <div class="flex items-start gap-3">
+            <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">Install e-Report</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Install aplikasi untuk akses lebih cepat dan notifikasi real-time</p>
+                <div class="flex gap-2">
+                    <button onclick="installPWA()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors">
+                        Install
+                    </button>
+                    <button onclick="dismissInstallPrompt()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg transition-colors">
+                        Nanti
+                    </button>
+                </div>
+            </div>
+            <button onclick="dismissInstallPrompt()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- PWA Scripts -->
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('[PWA] Service Worker registered:', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New service worker available
+                                    if (confirm('Update tersedia! Refresh halaman untuk update?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('[PWA] Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installPrompt = document.getElementById('pwa-install-prompt');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Check if user dismissed before
+            const dismissed = localStorage.getItem('pwa-install-dismissed');
+            const dismissedTime = dismissed ? parseInt(dismissed) : 0;
+            const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
+            
+            // Show prompt if not dismissed or dismissed more than 7 days ago
+            if (!dismissed || daysSinceDismissed > 7) {
+                setTimeout(() => {
+                    installPrompt.classList.remove('translate-y-full');
+                }, 3000); // Show after 3 seconds
+            }
+        });
+
+        async function installPWA() {
+            if (!deferredPrompt) {
+                return;
+            }
+
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('[PWA] User accepted install');
+                showToast('Aplikasi berhasil diinstall!', 'success');
+            }
+            
+            deferredPrompt = null;
+            installPrompt.classList.add('translate-y-full');
+        }
+
+        function dismissInstallPrompt() {
+            installPrompt.classList.add('translate-y-full');
+            localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+        }
+
+        // Detect if running as PWA
+        window.addEventListener('DOMContentLoaded', () => {
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches 
+                       || window.navigator.standalone 
+                       || document.referrer.includes('android-app://');
+            
+            if (isPWA) {
+                console.log('[PWA] Running as installed app');
+                document.body.classList.add('pwa-mode');
+            }
+        });
+
+        // Online/Offline detection
+        window.addEventListener('online', () => {
+            showToast('Koneksi internet kembali!', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('Anda sedang offline. Beberapa fitur mungkin tidak tersedia.', 'error');
+        });
+    </script>
     
     @stack('scripts')
 </body>

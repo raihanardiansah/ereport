@@ -110,6 +110,34 @@ class EmailService
     }
 
     /**
+     * Notify user when their report is closed/resolved.
+     */
+    public static function notifyReportClosed(Report $report): void
+    {
+        try {
+            // Only send if user has email
+            if (!$report->user || !$report->user->email) {
+                return;
+            }
+
+            // Get actions taken from comments
+            $actionsTaken = $report->comments()
+                ->where('type', 'action_taken')
+                ->pluck('content')
+                ->toArray();
+            
+            // Calculate total duration
+            $totalDurationHours = $report->created_at->diffInHours(now());
+
+            Mail::to($report->user->email)
+                ->send(new \App\Mail\ReportClosedSummaryMail($report, $actionsTaken, (int)$totalDurationHours));
+                
+        } catch (\Exception $e) {
+            Log::error('Failed to send report closed summary email: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Send weekly digest email to school admin.
      */
     public static function sendWeeklyDigest(School $school): void
