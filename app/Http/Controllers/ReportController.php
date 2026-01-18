@@ -345,14 +345,16 @@ public function __construct(SentimentAnalysisService $sentimentService)
         // Send email notifications
         EmailService::notifyReportSubmitted($report);
 
-        // Award gamification points
-        $gamification = app(GamificationService::class);
-        $isFirstReport = $user->reports()->count() === 1;
-        
-        if ($isFirstReport) {
-            $gamification->awardPoints($user, 'first_report', $report);
+        // Award gamification points (Only for Students)
+        if ($user->role === 'siswa') {
+            $gamification = app(GamificationService::class);
+            $isFirstReport = $user->reports()->count() === 1;
+            
+            if ($isFirstReport) {
+                $gamification->awardPoints($user, 'first_report', $report);
+            }
+            $gamification->awardPoints($user, 'report_submitted', $report);
         }
-        $gamification->awardPoints($user, 'report_submitted', $report);
 
         return redirect()->route('reports.show', $report)
             ->with('success', 'Laporan berhasil dikirim.');

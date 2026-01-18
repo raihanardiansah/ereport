@@ -6,7 +6,7 @@
 
     <div class="grid lg:grid-cols-3 gap-8">
         <!-- Main Leaderboard -->
-        <div class="lg:col-span-2">
+        <div class="{{ auth()->user()->role === 'siswa' ? 'lg:col-span-2' : 'lg:col-span-3' }}">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">Top 10 Kontributor</h2>
@@ -77,6 +77,7 @@
             </div>
         </div>
 
+        @if(auth()->user()->role === 'siswa')
         <!-- My Stats -->
         <div class="lg:col-span-1 space-y-6">
             <!-- Points Card -->
@@ -142,5 +143,6 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </x-layouts.app>
