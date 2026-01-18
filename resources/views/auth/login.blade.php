@@ -129,13 +129,32 @@
         </button>
     </form>
 
-    <!-- Register Link -->
-    <div class="mt-6 text-center text-sm">
-        <p class="text-gray-600">
-            Pengguna Baru?
-            <a href="{{ route('register.join') }}" class="text-[#00B4D8] hover:text-[#155E75] font-semibold">
-                Daftar
+    <!-- Register Options -->
+    <div class="mt-8 pt-6 border-t border-gray-100">
+        <h3 class="text-sm font-medium text-gray-500 text-center mb-4">Belum memiliki akun?</h3>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <!-- Join School (Student/Teacher) -->
+            <a href="{{ route('register.join') }}" class="flex flex-col items-center justify-center p-3 border border-gray-200 rounded-xl hover:border-[#3CB371] hover:bg-green-50/50 transition-all group">
+                <div class="h-8 w-8 rounded-full bg-green-100 text-[#3CB371] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </div>
+                <span class="text-xs font-semibold text-gray-700 text-center">Siswa & Guru</span>
+                <span class="text-[10px] text-gray-500 text-center">Gabung Sekolah</span>
             </a>
-        </p>
+
+            <!-- Register New School -->
+            <a href="{{ route('register') }}" class="flex flex-col items-center justify-center p-3 border border-gray-200 rounded-xl hover:border-[#00B4D8] hover:bg-cyan-50/50 transition-all group">
+                <div class="h-8 w-8 rounded-full bg-cyan-100 text-[#00B4D8] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                </div>
+                <span class="text-xs font-semibold text-gray-700 text-center">Sekolah Baru</span>
+                <span class="text-[10px] text-gray-500 text-center">Daftarkan Sekolah</span>
+            </a>
+        </div>
     </div>
 </x-layouts.guest>

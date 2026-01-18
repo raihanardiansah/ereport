@@ -470,9 +470,15 @@ class UserController extends Controller
         $user = User::where('school_id', auth()->user()->school_id)->findOrFail($id);
         $user->update(['is_approved' => true]);
 
-        // Send notification/email if needed
+        // Send notification email
+        try {
+            \Illuminate\Support\Facades\Mail::to($user)->send(new \App\Mail\AccountApproved($user));
+        } catch (\Exception $e) {
+            // Log error but don't stop the process
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim email approval: ' . $e->getMessage());
+        }
         
-        return redirect()->back()->with('success', 'Pengguna berhasil disetujui.');
+        return redirect()->back()->with('success', 'Pengguna berhasil disetujui dan email notifikasi telah dikirim.');
     }
 
     public function reject($id)
