@@ -136,7 +136,13 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Pelapor:</span>
-                    <span class="detail-value">{{ $report->user->name ?? 'Unknown' }}</span>
+                    <span class="detail-value">
+                        @if($report->is_anonymous)
+                            Pelapor (Anonim)
+                        @else
+                            {{ $report->user->name ?? 'Unknown' }}
+                        @endif
+                    </span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Waktu:</span>

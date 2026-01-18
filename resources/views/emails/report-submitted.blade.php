@@ -36,7 +36,13 @@
             <div class="report-details">
                 <h3>{{ $report->title }}</h3>
                 <p><span class="label">Kategori:</span> <span class="badge badge-category">{{ ucfirst($report->category) }}</span></p>
-                <p><span class="label">Pengirim:</span> {{ $report->user->name }} ({{ $report->user->getRoleDisplayName() }})</p>
+                <p><span class="label">Pengirim:</span> 
+                    @if($report->is_anonymous)
+                        Pelapor (Anonim)
+                    @else
+                        {{ $report->user->name }} ({{ $report->user->getRoleDisplayName() }})
+                    @endif
+                </p>
                 <p><span class="label">Waktu:</span> {{ $report->created_at->format('d/m/Y H:i') }}</p>
                 <p><span class="label">Klasifikasi AI:</span> 
                     <span class="badge badge-{{ $report->ai_classification ?? 'netral' }}">{{ ucfirst($report->ai_classification ?? 'Netral') }}</span>
