@@ -105,38 +105,8 @@
     </div>
 
     <!-- Reports List -->
-    <div x-data="{ loading: false }" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="divide-y divide-gray-100">
-            <!-- Skeleton Loading State -->
-            <template x-if="loading">
-                <div>
-                     @for($i = 0; $i < 5; $i++)
-                     <div class="p-4 sm:p-6 block">
-                        <div class="flex sm:items-start sm:justify-between sm:gap-6 mb-4">
-                             <div class="flex-1">
-                                 <div class="flex items-center gap-3 mb-2">
-                                     <div class="skeleton h-5 w-48 rounded"></div>
-                                     <div class="skeleton h-5 w-20 rounded-full"></div>
-                                 </div>
-                                 <div class="space-y-2 mb-3">
-                                     <div class="skeleton h-4 w-full rounded"></div>
-                                     <div class="skeleton h-4 w-3/4 rounded"></div>
-                                 </div>
-                                 <div class="flex items-center gap-4">
-                                     <div class="skeleton h-4 w-24 rounded"></div>
-                                     <div class="skeleton h-4 w-32 rounded"></div>
-                                 </div>
-                             </div>
-                             <div class="skeleton h-4 w-24 rounded"></div>
-                        </div>
-                     </div>
-                     @endfor
-                </div>
-            </template>
-
-            <!-- Real Content -->
-            <template x-if="!loading">
-                <div>
                     @forelse($reports as $report)
             <a href="{{ route('reports.show', $report) }}" class="block p-4 sm:p-6 hover:bg-gray-50 transition-colors">
                 <!-- Desktop Layout -->
