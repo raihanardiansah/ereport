@@ -133,7 +133,7 @@
     <div class="mt-6 text-center text-sm">
         <p class="text-gray-600">
             Pengguna Baru?
-            <a href="{{ route('register') }}" class="text-[#00B4D8] hover:text-[#155E75] font-semibold">
+            <a href="{{ route('register.join') }}" class="text-[#00B4D8] hover:text-[#155E75] font-semibold">
                 Daftar
             </a>
         </p>

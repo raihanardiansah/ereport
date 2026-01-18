@@ -1,4 +1,4 @@
-<x-layouts.auth title="Daftar Akun Baru">
+<x-layouts.guest title="Daftar Akun Baru">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Daftar Akun Baru
@@ -139,4 +139,4 @@
             </form>
         </div>
     </div>
-</x-layouts.auth>
+</x-layouts.guest>

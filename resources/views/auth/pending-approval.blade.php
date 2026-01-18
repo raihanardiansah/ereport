@@ -1,4 +1,4 @@
-<x-layouts.auth title="Menunggu Persetujuan">
+<x-layouts.guest title="Menunggu Persetujuan">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
