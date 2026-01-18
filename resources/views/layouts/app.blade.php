@@ -232,6 +232,13 @@
                             Auto-Assignment
                         </a>
 
+                        <a href="{{ route('settings.qr-codes.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('settings.qr-codes*') ? 'bg-gray-800 text-white' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4h-4v-2h4v-2m3 4h2v2h-2v-2zm-1-4h2v2h-2v-2zM6 20h2v2H6v-2zm-2-4h2v2H4v-2zm16-11h-2v2h2v-2zm-4 0h-2v2h2v-2zm-4 0h-2v2h2v-2zm-4 0h-2v2h2v-2zm-4 0H2v2h2V5zm16 11v-4h-4v4h4zm-8 4v-4H8v4h4zm8-8v-4h-4v4h4zm-8-4v-4H8v4h4zM8 5v4H4V5h4z"/>
+                            </svg>
+                            QR Codes
+                        </a>
+
                         <a href="{{ route('subscriptions.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>

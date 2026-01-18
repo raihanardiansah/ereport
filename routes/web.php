@@ -20,6 +20,9 @@ Route::get('/', function () {
     return view('landing', compact('packages'));
 })->name('home');
 
+// Quick Report QR Scan
+Route::get('/q/{code}', [\App\Http\Controllers\QrCodeController::class, 'handle'])->name('qr.scan');
+
 // Contact Form
 Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'submit'])->name('contact.submit');
 
@@ -83,6 +86,12 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::get('/auto-assignment', [\App\Http\Controllers\CategoryAssignmentController::class, 'index'])->name('settings.auto-assignment');
         Route::post('/auto-assignment', [\App\Http\Controllers\CategoryAssignmentController::class, 'store'])->name('settings.auto-assignment.store');
         Route::delete('/auto-assignment/{assignment}', [\App\Http\Controllers\CategoryAssignmentController::class, 'destroy'])->name('settings.auto-assignment.destroy');
+
+        // QR Code Settings
+        Route::get('/qr-codes', [\App\Http\Controllers\QrCodeController::class, 'index'])->name('settings.qr-codes.index');
+        Route::post('/qr-codes', [\App\Http\Controllers\QrCodeController::class, 'store'])->name('settings.qr-codes.store');
+        Route::get('/qr-codes/{qrCode}/print', [\App\Http\Controllers\QrCodeController::class, 'show'])->name('settings.qr-codes.show');
+        Route::delete('/qr-codes/{qrCode}', [\App\Http\Controllers\QrCodeController::class, 'destroy'])->name('settings.qr-codes.destroy');
     });
 
     // Audit Logs (Admin & Manajemen only)

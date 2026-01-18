@@ -14,17 +14,16 @@ class QrCode extends Model
     protected $fillable = [
         'school_id',
         'code',
-        'name',
-        'location',
-        'type',
-        'metadata',
+        'location_name',
+        'description',
+        'default_category',
+        'created_by',
         'scan_count',
         'last_scanned_at',
         'is_active',
     ];
 
     protected $casts = [
-        'metadata' => 'array',
         'last_scanned_at' => 'datetime',
         'is_active' => 'boolean',
     ];
@@ -37,23 +36,28 @@ class QrCode extends Model
         return $this->belongsTo(School::class);
     }
 
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     /**
      * Generate a new QR code for a school.
      */
     public static function generate(
         int $schoolId,
-        string $name,
-        string $type = 'general',
-        ?string $location = null,
-        ?array $metadata = null
+        string $locationName,
+        int $createdBy,
+        ?string $description = null,
+        ?string $defaultCategory = null
     ): self {
         return self::create([
             'school_id' => $schoolId,
             'code' => self::generateUniqueCode(),
-            'name' => $name,
-            'type' => $type,
-            'location' => $location,
-            'metadata' => $metadata,
+            'location_name' => $locationName,
+            'description' => $description,
+            'default_category' => $defaultCategory,
+            'created_by' => $createdBy,
             'is_active' => true,
         ]);
     }
