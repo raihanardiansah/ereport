@@ -46,7 +46,78 @@
         </form>
     </div>
 
-    <!-- Users Table (Desktop) / Cards (Mobile) -->
+    <!-- Pending Approvals -->
+    @if($pendingUsers->count() > 0)
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-yellow-800 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Menunggu Persetujuan ({{ $pendingUsers->count() }})
+            </h2>
+        </div>
+
+        <div class="bg-white rounded-lg border border-yellow-100 overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-yellow-50/50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu Daftar</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach($pendingUsers as $pUser)
+                    <tr>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <span class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold mr-3">
+                                    {{ substr($pUser->name, 0, 1) }}
+                                </span>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $pUser->name }}</div>
+                                    <div class="text-xs text-gray-500">{{ $pUser->email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                {{ $pUser->getRoleDisplayName() }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            {{ $pUser->created_at->diffForHumans() }}
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <form action="{{ route('users.approve', $pUser) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 shadow-sm focus:outline-none ring-1 ring-offset-1 ring-green-600">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Terima
+                                </button>
+                            </form>
+                            <form action="{{ route('users.reject', $pUser) }}" method="POST" class="inline" onsubmit="return confirm('Tolak dan hapus data pendaftar ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none ring-1 ring-offset-1 ring-red-500">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                    Tolak
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <!-- Mobile Card View -->
         <div class="md:hidden divide-y divide-gray-100">

@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'subscription' => \App\Http\Middleware\CheckSubscription::class,
+            'approved' => \App\Http\Middleware\EnsureUserIsApproved::class,
         ]);
         
         // Exclude webhook from CSRF verification

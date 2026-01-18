@@ -34,9 +34,18 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
-        $users = $query->orderBy('name')->paginate(10);
+        // Get Pending Users separately
+        $pendingUsers = User::where('school_id', auth()->user()->school_id)
+            ->where('is_approved', false)
+            ->latest()
+            ->get();
+
+        // Get Active Users
+        $users = $query->where('is_approved', true)
+            ->orderBy('name')
+            ->paginate(10);
         
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users', 'pendingUsers'));
     }
 
     /**
@@ -454,5 +463,23 @@ class UserController extends Controller
         }
 
         return $phone;
+    }
+
+    public function approve($id)
+    {
+        $user = User::where('school_id', auth()->user()->school_id)->findOrFail($id);
+        $user->update(['is_approved' => true]);
+
+        // Send notification/email if needed
+        
+        return redirect()->back()->with('success', 'Pengguna berhasil disetujui.');
+    }
+
+    public function reject($id)
+    {
+        $user = User::where('school_id', auth()->user()->school_id)->findOrFail($id);
+        $user->delete();
+
+        return redirect()->back()->with('success', 'Pengajuan pengguna ditolak dan dihapus.');
     }
 }

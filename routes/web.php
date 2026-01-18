@@ -39,6 +39,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [\App\Http\Controllers\SchoolController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [\App\Http\Controllers\SchoolController::class, 'register'])->name('register.store');
     
+    // Self-Registration with Join Code
+    Route::get('/register/join', [\App\Http\Controllers\JoinSchoolController::class, 'showRegistrationForm'])->name('register.join');
+    Route::post('/register/join', [\App\Http\Controllers\JoinSchoolController::class, 'register']);
+    
     // Password Reset Routes
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
@@ -155,6 +159,10 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         
         Route::resource('users', \App\Http\Controllers\UserController::class)
             ->except(['show']);
+
+        // User Approval
+        Route::post('/users/{user}/approve', [\App\Http\Controllers\UserController::class, 'approve'])->name('users.approve');
+        Route::delete('/users/{user}/reject', [\App\Http\Controllers\UserController::class, 'reject'])->name('users.reject');
     });
 
     // Analytics - Admin & Manajemen Sekolah
