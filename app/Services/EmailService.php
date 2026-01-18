@@ -33,16 +33,23 @@ class EmailService
                 return;
             }
 
+            // Send emails with staggered delay (2 seconds between each) to respect rate limit
+            $delay = 0;
             foreach ($recipients as $email) {
-                Mail::to($email)->send(new ReportSubmittedMail($report));
+                \App\Jobs\SendEmailJob::dispatch(
+                    $email,
+                    new ReportSubmittedMail($report),
+                    $delay
+                );
+                $delay += 2; // 2 seconds delay between emails
             }
 
-            Log::info('Report submitted emails sent', [
+            Log::info('Report submitted emails queued', [
                 'report_id' => $report->id,
                 'recipients_count' => count($recipients)
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to send report submitted email', [
+            Log::error('Failed to queue report submitted emails', [
                 'report_id' => $report->id,
                 'error' => $e->getMessage()
             ]);
@@ -57,7 +64,7 @@ class EmailService
         try {
             // Notify the report creator
             $creator = $report->user;
-            
+
             if ($creator && $creator->email) {
                 Mail::to($creator->email)->send(
                     new ReportStatusChangedMail($report, $oldStatus, $newStatus)
@@ -125,13 +132,13 @@ class EmailService
                 ->where('type', 'action_taken')
                 ->pluck('content')
                 ->toArray();
-            
+
             // Calculate total duration
             $totalDurationHours = $report->created_at->diffInHours(now());
 
             Mail::to($report->user->email)
-                ->send(new \App\Mail\ReportClosedSummaryMail($report, $actionsTaken, (int)$totalDurationHours));
-                
+                ->send(new \App\Mail\ReportClosedSummaryMail($report, $actionsTaken, (int) $totalDurationHours));
+
         } catch (\Exception $e) {
             Log::error('Failed to send report closed summary email: ' . $e->getMessage());
         }
@@ -154,7 +161,7 @@ class EmailService
 
             // Calculate weekly stats
             $weekStart = now()->subWeek();
-            
+
             $stats = [
                 'total_reports' => Report::where('school_id', $school->id)
                     ->where('created_at', '>=', $weekStart)
@@ -170,10 +177,10 @@ class EmailService
                     ->where('created_at', '>=', $weekStart)
                     ->where(function ($q) {
                         $q->where('manual_classification', 'negatif')
-                          ->orWhere(function ($q2) {
-                              $q2->whereNull('manual_classification')
-                                 ->where('ai_classification', 'negatif');
-                          });
+                            ->orWhere(function ($q2) {
+                                $q2->whereNull('manual_classification')
+                                    ->where('ai_classification', 'negatif');
+                            });
                     })
                     ->count(),
             ];
@@ -244,19 +251,24 @@ class EmailService
                 return;
             }
 
+            // Send emails with staggered delay (2 seconds between each) to respect rate limit
+            $delay = 0;
             foreach ($recipients as $email) {
-                Mail::to($email)->send(
-                    new \App\Mail\ReportEscalatedMail($report, $hoursPending)
+                \App\Jobs\SendEmailJob::dispatch(
+                    $email,
+                    new \App\Mail\ReportEscalatedMail($report, $hoursPending),
+                    $delay
                 );
+                $delay += 2; // 2 seconds delay between emails
             }
 
-            Log::info('Report escalated emails sent', [
+            Log::info('Report escalated emails queued', [
                 'report_id' => $report->id,
                 'recipients_count' => count($recipients),
                 'hours_pending' => $hoursPending
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to send report escalated email', [
+            Log::error('Failed to queue report escalated emails', [
                 'report_id' => $report->id,
                 'error' => $e->getMessage()
             ]);
@@ -283,10 +295,12 @@ class EmailService
             }
 
             // Also notify assigned user if exists and is not the commenter
-            if ($report->assigned_to && 
-                $report->assigned_to !== $comment->user_id && 
-                $report->assignedTo->email) {
-                
+            if (
+                $report->assigned_to &&
+                $report->assigned_to !== $comment->user_id &&
+                $report->assignedTo->email
+            ) {
+
                 Mail::to($report->assignedTo->email)->send(
                     new \App\Mail\ReportCommentMail($report, $comment)
                 );

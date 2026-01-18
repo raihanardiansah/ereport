@@ -133,6 +133,7 @@
 </head>
 <body>
     <div class="header">
+        <p style="font-size: 10px; color: #6366f1; font-weight: bold; margin-bottom: 5px;">📄 e-Report - Sistem Pelaporan Digital</p>
         <h1>{{ $school->name }}</h1>
         <h2>Raport Perilaku Guru/Staf</h2>
         <p>{{ $school->address ?? 'Alamat Sekolah' }}</p>

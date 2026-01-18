@@ -34,21 +34,21 @@ class AuthController extends Controller
             'g-recaptcha-response_value' => $request->input('g-recaptcha-response'),
             'g-recaptcha-response_length' => strlen($request->input('g-recaptcha-response', '')),
         ]);
-        
+
         $request->validate([
-        'username' => [
-            'required',
-            'string',
-            'min:3', 
-            'max:255',
-        ],
-        'password' => 'required|string|min:8',
-    ], [
-        'username.required' => 'Username, Email, atau No. HP wajib diisi.',
-        'username.min' => 'Input minimal 3 karakter.',
-        'username.max' => 'Input maksimal 255 karakter.',
-        'password.min' => 'Password minimal 8 karakter.',
-    ]);
+            'username' => [
+                'required',
+                'string',
+                'min:3',
+                'max:255',
+            ],
+            'password' => 'required|string|min:8',
+        ], [
+            'username.required' => 'Username, Email, atau No. HP wajib diisi.',
+            'username.min' => 'Input minimal 3 karakter.',
+            'username.max' => 'Input maksimal 255 karakter.',
+            'password.min' => 'Password minimal 8 karakter.',
+        ]);
 
         // Determine input type
         $loginValue = $request->username;
@@ -81,15 +81,23 @@ class AuthController extends Controller
         // Verify password
         if (!Hash::check($request->password, $user->password)) {
             $user->incrementFailedAttempts();
-            
+
             $remaining = 5 - $user->failed_login_attempts;
-            $message = $remaining > 0 
+            $message = $remaining > 0
                 ? "Password salah. {$remaining} percobaan tersisa."
                 : "Akun terkunci selama 15 menit.";
-            
+
             throw ValidationException::withMessages([
                 'password' => [$message],
             ]);
+        }
+
+        // Check if user is approved
+        if (!$user->is_approved) {
+            // Log them in temporarily so they can see the pending approval page
+            Auth::login($user);
+            $request->session()->regenerate();
+            return redirect()->route('approval.notice');
         }
 
         // Check school subscription (except super_admin)
@@ -113,7 +121,7 @@ class AuthController extends Controller
      */
     protected function getRedirectPath(User $user): string
     {
-        return match($user->role) {
+        return match ($user->role) {
             'super_admin' => route('dashboard.super-admin'),
             'admin_sekolah' => route('dashboard.admin-sekolah'),
             'manajemen_sekolah' => route('dashboard.manajemen-sekolah'),

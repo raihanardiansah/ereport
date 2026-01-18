@@ -38,11 +38,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [\App\Http\Controllers\SchoolController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [\App\Http\Controllers\SchoolController::class, 'register'])->name('register.store');
-    
+
     // Self-Registration with Join Code
     Route::get('/register/join', [\App\Http\Controllers\JoinSchoolController::class, 'showRegistrationForm'])->name('register.join');
     Route::post('/register/join', [\App\Http\Controllers\JoinSchoolController::class, 'register']);
-    
+
     // Password Reset Routes
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
@@ -52,6 +52,11 @@ Route::middleware('guest')->group(function () {
 
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+// Pending Approval Notice (for authenticated but unapproved users)
+Route::get('/pending-approval', function () {
+    return view('auth.pending-approval');
+})->name('approval.notice')->middleware('auth');
 
 // Midtrans Webhook (no auth required - called by Midtrans)
 Route::post('/webhook/midtrans', [\App\Http\Controllers\WebhookController::class, 'handle'])->name('webhook.midtrans');
@@ -63,10 +68,10 @@ Route::middleware('auth')->prefix('api')->group(function () {
 
 
 // Protected Routes (Authenticated Users)
-Route::middleware(['auth', 'subscription'])->group(function () {
+Route::middleware(['auth', 'approved', 'subscription'])->group(function () {
     // Main Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Leaderboard
     Route::get('/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard.index');
 
@@ -76,7 +81,7 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::put('/', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/avatar', [\App\Http\Controllers\ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
         Route::put('/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password');
-        
+
         // Session management
         Route::get('/sessions', [\App\Http\Controllers\ProfileController::class, 'sessions'])->name('profile.sessions');
         Route::delete('/sessions/{session}', [\App\Http\Controllers\ProfileController::class, 'destroySession'])->name('profile.sessions.destroy');
@@ -84,7 +89,7 @@ Route::middleware(['auth', 'subscription'])->group(function () {
     });
     Route::get('/settings', [\App\Http\Controllers\ProfileController::class, 'settings'])->name('settings');
     Route::put('/settings', [\App\Http\Controllers\ProfileController::class, 'updateSettings'])->name('settings.update');
-    
+
     // Auto-assignment Settings (Admin only)
     Route::middleware(RoleMiddleware::class . ':admin_sekolah')->prefix('settings')->group(function () {
         Route::get('/auto-assignment', [\App\Http\Controllers\CategoryAssignmentController::class, 'index'])->name('settings.auto-assignment');
@@ -103,28 +108,28 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::get('/audit-logs', [\App\Http\Controllers\AuditLogController::class, 'index'])->name('audit.index');
         Route::get('/reports/{report}/audit', [\App\Http\Controllers\AuditLogController::class, 'show'])->name('audit.show');
     });
-    
+
     // Role-specific dashboard routes
     Route::get('/dashboard/super-admin', [DashboardController::class, 'superAdmin'])
         ->middleware(RoleMiddleware::class . ':super_admin')
         ->name('dashboard.super-admin');
-    
+
     Route::get('/dashboard/admin-sekolah', [DashboardController::class, 'adminSekolah'])
         ->middleware(RoleMiddleware::class . ':admin_sekolah')
         ->name('dashboard.admin-sekolah');
-    
+
     Route::get('/dashboard/manajemen-sekolah', [DashboardController::class, 'manajemenSekolah'])
         ->middleware(RoleMiddleware::class . ':manajemen_sekolah')
         ->name('dashboard.manajemen-sekolah');
-    
+
     Route::get('/dashboard/staf-kesiswaan', [DashboardController::class, 'stafKesiswaan'])
         ->middleware(RoleMiddleware::class . ':staf_kesiswaan')
         ->name('dashboard.staf-kesiswaan');
-    
+
     Route::get('/dashboard/guru', [DashboardController::class, 'guru'])
         ->middleware(RoleMiddleware::class . ':guru')
         ->name('dashboard.guru');
-    
+
     Route::get('/dashboard/siswa', [DashboardController::class, 'siswa'])
         ->middleware(RoleMiddleware::class . ':siswa')
         ->name('dashboard.siswa');
@@ -156,14 +161,14 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::get('/users/import', [\App\Http\Controllers\UserController::class, 'showImport'])->name('users.import');
         Route::post('/users/import', [\App\Http\Controllers\UserController::class, 'processImport'])->name('users.import.process');
         Route::get('/users/import/template', [\App\Http\Controllers\UserController::class, 'downloadTemplate'])->name('users.import.template');
-        
+
         Route::resource('users', \App\Http\Controllers\UserController::class)
             ->except(['show']);
 
         // User Approval
         Route::post('/users/{user}/approve', [\App\Http\Controllers\UserController::class, 'approve'])->name('users.approve');
         Route::delete('/users/{user}/reject', [\App\Http\Controllers\UserController::class, 'reject'])->name('users.reject');
-        
+
         // Password Reset by Admin
         Route::post('/users/{user}/reset-password', [\App\Http\Controllers\UserController::class, 'resetPassword'])->name('users.reset-password');
     });
@@ -192,12 +197,12 @@ Route::middleware(['auth', 'subscription'])->group(function () {
     Route::middleware(RoleMiddleware::class . ':admin_sekolah')->prefix('subscriptions')->group(function () {
         Route::get('/', [\App\Http\Controllers\SubscriptionController::class, 'index'])->name('subscriptions.index');
         Route::get('/history', [\App\Http\Controllers\SubscriptionController::class, 'paymentHistory'])->name('subscriptions.history');
-        
+
         // Invoice routes
         Route::get('/invoice/{orderId}/view', [\App\Http\Controllers\SubscriptionController::class, 'viewInvoice'])->name('subscriptions.invoice.view');
         Route::get('/invoice/{orderId}/download', [\App\Http\Controllers\SubscriptionController::class, 'downloadInvoicePdf'])->name('subscriptions.invoice.download');
         Route::get('/invoice/{payment}', [\App\Http\Controllers\SubscriptionController::class, 'downloadInvoice'])->name('subscriptions.invoice');
-        
+
         // Package selection and checkout (using PaymentController for Midtrans)
         Route::get('/packages', [\App\Http\Controllers\SubscriptionController::class, 'selectPackage'])->name('subscriptions.packages');
         Route::get('/checkout/{package}', [\App\Http\Controllers\PaymentController::class, 'checkout'])->name('subscriptions.checkout');
@@ -206,7 +211,7 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::get('/check-status/{orderId}', [\App\Http\Controllers\PaymentController::class, 'checkStatus'])->name('subscriptions.check-status');
         Route::post('/cancel/{orderId}', [\App\Http\Controllers\PaymentController::class, 'cancelTransaction'])->name('subscriptions.cancel');
         Route::post('/unsubscribe', [\App\Http\Controllers\SubscriptionController::class, 'unsubscribe'])->name('subscriptions.unsubscribe');
-        
+
         // Promo validation
         Route::post('/validate-promo', [\App\Http\Controllers\SubscriptionController::class, 'validatePromo'])->name('subscriptions.validate-promo');
     });
@@ -261,13 +266,13 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::put('/schools/{school}/subscription', [\App\Http\Controllers\AdminController::class, 'updateSchoolSubscription'])->name('admin.school.update-subscription');
         Route::get('/audit-logs', [\App\Http\Controllers\AdminController::class, 'auditLogs'])->name('admin.audit-logs');
         Route::get('/backup', [\App\Http\Controllers\AdminController::class, 'backup'])->name('admin.backup');
-        
+
         // New superadmin features
         Route::get('/analytics', [\App\Http\Controllers\AdminController::class, 'analytics'])->name('admin.analytics');
         Route::get('/student-cases', [\App\Http\Controllers\AdminController::class, 'allStudentCases'])->name('admin.student-cases');
         Route::get('/export/csv/{type}', [\App\Http\Controllers\AdminController::class, 'exportCsv'])->name('admin.export.csv');
         Route::get('/export/pdf', [\App\Http\Controllers\AdminController::class, 'exportPdf'])->name('admin.export.pdf');
-        
+
         // Messages Management
         Route::get('/messages', [\App\Http\Controllers\ContactController::class, 'index'])->name('admin.messages');
         Route::get('/messages/unread-count', [\App\Http\Controllers\ContactController::class, 'unreadCount'])->name('admin.messages.unread-count');
@@ -280,7 +285,7 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         // Package & Promotion Management
         Route::get('/packages', [\App\Http\Controllers\Admin\PackageController::class, 'index'])->name('admin.packages');
         Route::post('/packages/sync', [\App\Http\Controllers\Admin\PackageController::class, 'syncPackages'])->name('admin.packages.sync');
-        
+
         // Package CRUD
         Route::get('/packages/create', [\App\Http\Controllers\Admin\PackageController::class, 'createPackage'])->name('admin.packages.create');
         Route::post('/packages', [\App\Http\Controllers\Admin\PackageController::class, 'storePackage'])->name('admin.packages.store');
@@ -289,7 +294,7 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         Route::post('/packages/{package}/toggle', [\App\Http\Controllers\Admin\PackageController::class, 'togglePackage'])->name('admin.packages.toggle');
         Route::delete('/packages/{package}', [\App\Http\Controllers\Admin\PackageController::class, 'deletePackage'])->name('admin.packages.delete');
         Route::post('/packages/reorder', [\App\Http\Controllers\Admin\PackageController::class, 'reorderPackages'])->name('admin.packages.reorder');
-        
+
         // Promotion CRUD
         Route::get('/promotions/create', [\App\Http\Controllers\Admin\PackageController::class, 'createPromotion'])->name('admin.promotions.create');
         Route::post('/promotions', [\App\Http\Controllers\Admin\PackageController::class, 'storePromotion'])->name('admin.promotions.store');

@@ -22,12 +22,12 @@ class ReportController extends Controller
 
     protected SentimentAnalysisService $sentimentService;
 
-public function __construct(SentimentAnalysisService $sentimentService)
-{
-    $this->sentimentService = $sentimentService;
-}
+    public function __construct(SentimentAnalysisService $sentimentService)
+    {
+        $this->sentimentService = $sentimentService;
+    }
 
-    
+
     /**
      * Display a listing of reports.
      */
@@ -41,18 +41,18 @@ public function __construct(SentimentAnalysisService $sentimentService)
             if ($user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])) {
                 // School staff can see school reports based on visibility rules
                 $query->where('school_id', $user->school_id);
-                
+
                 // staf_kesiswaan cannot see reports about teachers (checks multi-accused)
                 if ($user->role === 'staf_kesiswaan') {
                     $query->where(function ($q) {
                         // Can see: reports with no accused OR reports where all accused are students
                         $q->whereDoesntHave('accusedUsers')  // No accused = general report
-                          ->orWhere(function ($sub) {
-                              // Has accused but none are teachers
-                              $sub->whereDoesntHave('accusedUsers', function ($accused) {
-                                  $accused->whereIn('role', ['guru', 'staf_kesiswaan']);
-                              });
-                          });
+                            ->orWhere(function ($sub) {
+                                // Has accused but none are teachers
+                                $sub->whereDoesntHave('accusedUsers', function ($accused) {
+                                    $accused->whereIn('role', ['guru', 'staf_kesiswaan']);
+                                });
+                            });
                     });
                 }
                 // manajemen_sekolah and admin_sekolah can see all reports
@@ -65,9 +65,9 @@ public function __construct(SentimentAnalysisService $sentimentService)
         // Search filter
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             });
         }
 
@@ -108,7 +108,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
         }
 
         $reports = $query->latest()->paginate(10);
-        
+
         return view('reports.index', compact('reports'));
     }
 
@@ -118,12 +118,12 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function create()
     {
         $user = auth()->user();
-        
+
         // Get reportable users based on the reporter's role
         // Student: can report other students, teachers, staf_kesiswaan
         // Teacher/Staf: can report other teachers, students, staf_kesiswaan
         $reportableUsers = collect();
-        
+
         // Get all reportable users from the same school
         $reportableUsers = User::where('school_id', $user->school_id)
             ->where('id', '!=', $user->id) // Cannot report self
@@ -131,7 +131,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
             ->orderByRaw("FIELD(role, 'siswa', 'guru', 'staf_kesiswaan')")
             ->orderBy('name')
             ->get(['id', 'name', 'role']);
-        
+
         return view('reports.create', compact('reportableUsers'));
     }
 
@@ -151,11 +151,30 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'category' => [
                 'nullable', // Now optional - AI will suggest if not provided
                 Rule::in([
-                    'perilaku', 'akademik', 'kehadiran', 'bullying', 'konseling',
-                    'kesehatan', 'fasilitas', 'prestasi', 'keamanan', 'ekstrakurikuler',
-                    'sosial', 'keuangan', 'kebersihan', 'kantin', 'transportasi',
-                    'teknologi', 'guru', 'kurikulum', 'perpustakaan', 'laboratorium',
-                    'olahraga', 'keagamaan', 'saran', 'lainnya'
+                    'perilaku',
+                    'akademik',
+                    'kehadiran',
+                    'bullying',
+                    'konseling',
+                    'kesehatan',
+                    'fasilitas',
+                    'prestasi',
+                    'keamanan',
+                    'ekstrakurikuler',
+                    'sosial',
+                    'keuangan',
+                    'kebersihan',
+                    'kantin',
+                    'transportasi',
+                    'teknologi',
+                    'guru',
+                    'kurikulum',
+                    'perpustakaan',
+                    'laboratorium',
+                    'olahraga',
+                    'keagamaan',
+                    'saran',
+                    'lainnya'
                 ]),
             ],
             'content' => [
@@ -194,7 +213,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
         // Handle anonymous reporting with rate limiting
         $isAnonymous = $request->boolean('is_anonymous');
         $deviceFingerprint = $request->input('device_fingerprint');
-        
+
         if ($isAnonymous && $deviceFingerprint) {
             $ip = $request->ip();
             if (!AnonymousReportLimit::canSubmitAnonymous($deviceFingerprint, $ip)) {
@@ -241,7 +260,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
             } else {
                 // For PDF, keep strict 3MB limit
                 if ($file->getSize() > 3072 * 1024) {
-                     return back()->withErrors(['attachment' => 'Ukuran file PDF maksimal 3MB.'])->withInput();
+                    return back()->withErrors(['attachment' => 'Ukuran file PDF maksimal 3MB.'])->withInput();
                 }
 
                 $attachmentPath = $file->store(
@@ -253,7 +272,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
 
         // Use Google Gemini AI for FULL analysis (title + sentiment + category) in ONE call
         $aiResult = $this->sentimentService->analyzeReportFull($validated['content']);
-        
+
         // Use AI-generated title or user-provided (if any)
         $title = $validated['title'] ?? $aiResult['title'];
 
@@ -281,7 +300,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
         if ($isAnonymous && $deviceFingerprint) {
             AnonymousReportLimit::incrementCount($deviceFingerprint, $request->ip());
         }
-        
+
 
         // Attach accused users (multi-accused support)
         if (!empty($accusedUserIds)) {
@@ -290,9 +309,23 @@ public function __construct(SentimentAnalysisService $sentimentService)
 
         // Auto-assign based on category (if configured)
         $autoAssignedUser = CategoryAssignment::getAssignedUser($user->school_id, $finalCategory);
+
+        // IMPORTANT: Check if assigned user can actually handle this report
+        // staf_kesiswaan cannot handle reports about teachers/staff
+        if ($autoAssignedUser && $autoAssignedUser->role === 'staf_kesiswaan' && !empty($accusedUserIds)) {
+            $hasTeacherAccused = User::whereIn('id', $accusedUserIds)
+                ->whereIn('role', ['guru', 'staf_kesiswaan'])
+                ->exists();
+
+            if ($hasTeacherAccused) {
+                // Don't auto-assign to staf_kesiswaan, let manajemen/admin handle
+                $autoAssignedUser = null;
+            }
+        }
+
         if ($autoAssignedUser) {
             $report->update(['assigned_to' => $autoAssignedUser->id]);
-            
+
             // Notify assigned user
             Notification::create([
                 'user_id' => $autoAssignedUser->id,
@@ -334,14 +367,14 @@ public function __construct(SentimentAnalysisService $sentimentService)
             // Dispatch job with staggered delays (2 seconds between emails to be safe with Resend)
             foreach ($admins as $index => $admin) {
                 // Delay: 0s, 2s, 4s, 6s...
-                $delay = $index * 2; 
+                $delay = $index * 2;
                 \App\Jobs\SendCriticalReportEmail::dispatch($report, $admin, $delay);
             }
         }
 
         // Send notifications to school admins and BK teachers
         Notification::notifyReportSubmitted($report);
-        
+
         // Send email notifications
         EmailService::notifyReportSubmitted($report);
 
@@ -349,7 +382,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
         if ($user->role === 'siswa') {
             $gamification = app(GamificationService::class);
             $isFirstReport = $user->reports()->count() === 1;
-            
+
             if ($isFirstReport) {
                 $gamification->awardPoints($user, 'first_report', $report);
             }
@@ -366,7 +399,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function show(Report $report)
     {
         $user = auth()->user();
-        
+
         // Authorization check
         if (!$user->isSuperAdmin()) {
             if ($user->school_id !== $report->school_id) {
@@ -376,7 +409,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
             if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) && $user->id !== $report->user_id) {
                 abort(403);
             }
-            
+
             // staf_kesiswaan cannot view reports about teachers (multi-accused check)
             if ($user->role === 'staf_kesiswaan' && $report->hasTeacherAccused()) {
                 abort(403, 'Anda tidak memiliki akses untuk melihat laporan tentang guru.');
@@ -384,7 +417,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
         }
 
         $report->load(['user', 'school', 'accusedUsers']);
-        
+
         return view('reports.show', compact('report'));
     }
 
@@ -394,7 +427,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function updateStatus(Request $request, Report $report)
     {
         $user = auth()->user();
-        
+
         // Only admin_sekolah, manajemen_sekolah, staf_kesiswaan can update status
         if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) && !$user->isSuperAdmin()) {
             abort(403);
@@ -407,6 +440,17 @@ public function __construct(SentimentAnalysisService $sentimentService)
         $validated = $request->validate([
             'status' => ['required', Rule::in(['dikirim', 'diproses', 'ditindaklanjuti', 'selesai'])],
         ]);
+
+        // VALIDATION: Require at least one 'action_taken' comment before closing
+        if ($validated['status'] === 'selesai') {
+            $hasResolution = $report->comments()
+                ->where('type', 'action_taken')
+                ->exists();
+
+            if (!$hasResolution) {
+                return back()->with('error', 'Laporan tidak bisa diselesaikan. Harap tambahkan minimal satu "Aksi/Resolusi" terlebih dahulu untuk mendokumentasikan penyelesaian kasus.');
+            }
+        }
 
         $oldStatus = $report->status;
         $report->update(['status' => $validated['status']]);
@@ -426,7 +470,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
                 'message' => "Laporan '{$report->title}' diubah dari {$oldStatus} menjadi {$validated['status']}",
                 'data' => ['report_id' => $report->id],
             ]);
-            
+
             // Send email notification
             if ($validated['status'] === 'selesai') {
                 // If closed, send detailed summary email instead of generic status update
@@ -460,7 +504,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function updateClassification(Request $request, Report $report)
     {
         $user = auth()->user();
-        
+
         if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) && !$user->isSuperAdmin()) {
             abort(403);
         }
@@ -471,13 +515,35 @@ public function __construct(SentimentAnalysisService $sentimentService)
 
         $validated = $request->validate([
             'manual_classification' => ['nullable', Rule::in(['positif', 'negatif', 'netral'])],
-            'manual_category' => ['nullable', Rule::in([
-                'perilaku', 'akademik', 'kehadiran', 'bullying', 'konseling',
-                'kesehatan', 'fasilitas', 'prestasi', 'keamanan', 'ekstrakurikuler',
-                'sosial', 'keuangan', 'kebersihan', 'kantin', 'transportasi',
-                'teknologi', 'guru', 'kurikulum', 'perpustakaan', 'laboratorium',
-                'olahraga', 'keagamaan', 'saran', 'lainnya'
-            ])],
+            'manual_category' => [
+                'nullable',
+                Rule::in([
+                    'perilaku',
+                    'akademik',
+                    'kehadiran',
+                    'bullying',
+                    'konseling',
+                    'kesehatan',
+                    'fasilitas',
+                    'prestasi',
+                    'keamanan',
+                    'ekstrakurikuler',
+                    'sosial',
+                    'keuangan',
+                    'kebersihan',
+                    'kantin',
+                    'transportasi',
+                    'teknologi',
+                    'guru',
+                    'kurikulum',
+                    'perpustakaan',
+                    'laboratorium',
+                    'olahraga',
+                    'keagamaan',
+                    'saran',
+                    'lainnya'
+                ])
+            ],
         ]);
 
         $updates = [];
@@ -508,7 +574,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function destroy(Report $report)
     {
         $user = auth()->user();
-        
+
         // Only creator or admin can delete
         if ($user->id !== $report->user_id && !$user->isAdminSekolah() && !$user->isSuperAdmin()) {
             abort(403);
@@ -536,14 +602,14 @@ public function __construct(SentimentAnalysisService $sentimentService)
     // protected function simulateAIClassification(string $content): string
     // {
     //     $content = strtolower($content);
-        
+
     //     // Keywords for negative sentiment
     //     $negativeKeywords = [
     //         'bullying', 'kekerasan', 'perkelahian', 'bolos', 'malas', 'tidak hadir',
     //         'mencontek', 'curang', 'melanggar', 'masalah', 'buruk', 'nakal',
     //         'terlambat', 'berkelahi', 'mengancam', 'intimidasi', 'merokok',
     //     ];
-        
+
     //     // Keywords for positive sentiment
     //     $positiveKeywords = [
     //         'prestasi', 'juara', 'berprestasi', 'bagus', 'baik', 'rajin',
@@ -581,7 +647,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function storeComment(Request $request, Report $report)
     {
         $user = auth()->user();
-        
+
         // Only staff can add comments
         if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) && !$user->isSuperAdmin()) {
             abort(403);
@@ -634,7 +700,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function assignReport(Request $request, Report $report)
     {
         $user = auth()->user();
-        
+
         // Only admin, manajemen, and staf_kesiswaan can assign
         if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) && !$user->isSuperAdmin()) {
             abort(403);
@@ -684,7 +750,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
     public function unassignReport(Report $report)
     {
         $user = auth()->user();
-        
+
         // Only admin, manajemen, and staf_kesiswaan can unassign
         if (!$user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) && !$user->isSuperAdmin()) {
             abort(403);

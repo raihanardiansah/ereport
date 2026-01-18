@@ -25,8 +25,8 @@ class ReportComment extends Model
     public const TYPES = [
         'comment' => 'Komentar',
         'follow_up' => 'Tindak Lanjut',
-        'counseling_note' => 'Catatan Konseling',
-        'action_taken' => 'Aksi yang Diambil',
+        'action_taken' => 'Aksi/Resolusi',
+        'counseling_note' => 'Catatan Internal',
     ];
 
     /**
@@ -90,7 +90,7 @@ class ReportComment extends Model
         if ($user->hasAnyRole(['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan']) || $user->isSuperAdmin()) {
             return $query;
         }
-        
+
         return $query->where('is_private', false);
     }
 }
