@@ -105,7 +105,7 @@
     </div>
 
     <!-- Reports List -->
-    <div x-data="{ loading: true }" x-init="setTimeout(() => loading = false, 800)" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div x-data="{ loading: false }" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="divide-y divide-gray-100">
             <!-- Skeleton Loading State -->
             <template x-if="loading">
