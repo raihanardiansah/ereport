@@ -57,13 +57,7 @@
             >
         </div>
 
-        <!-- reCAPTCHA v2 -->
-        <div>
-            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-            @error('g-recaptcha-response')
-                <p class="mt-1 text-xs text-danger-600">{{ $message }}</p>
-            @enderror
-        </div>
+
 
         <!-- Submit Button -->
         <button type="submit" class="w-full bg-gradient-to-r from-[#3CB371] to-[#00B4D8] hover:from-[#2E8B57] hover:to-[#0096C7] text-white font-semibold py-2.5 px-4 rounded-lg transition-all flex items-center justify-center gap-2 text-sm">

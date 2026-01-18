@@ -43,37 +43,12 @@ class AuthController extends Controller
             'max:255',
         ],
         'password' => 'required|string|min:8',
-        'g-recaptcha-response' => 'required',
     ], [
         'username.required' => 'Username, Email, atau No. HP wajib diisi.',
         'username.min' => 'Input minimal 3 karakter.',
         'username.max' => 'Input maksimal 255 karakter.',
         'password.min' => 'Password minimal 8 karakter.',
-        'g-recaptcha-response.required' => 'Silakan centang reCAPTCHA.',
     ]);
-    
-    
-    // Verify reCAPTCHA
-    try {
-        $recaptcha = new \ReCaptcha\ReCaptcha(config('services.recaptcha.secret_key'));
-        $resp = $recaptcha->verify($request->input('g-recaptcha-response'), $request->ip());
-        
-        if (!$resp->isSuccess()) {
-            if (config('app.env') === 'local') {
-                \Log::warning('reCAPTCHA verification failed in local environment', [
-                    'errors' => $resp->getErrorCodes()
-                ]);
-            } else {
-                return back()->withErrors(['g-recaptcha-response' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.'])->withInput();
-            }
-        }
-    } catch (\Exception $e) {
-        \Log::error('reCAPTCHA verification error: ' . $e->getMessage());
-        
-        if (config('app.env') !== 'local') {
-            return back()->withErrors(['g-recaptcha-response' => 'Tidak dapat memverifikasi reCAPTCHA. Silakan coba lagi.'])->withInput();
-        }
-    }
 
         // Determine input type
         $loginValue = $request->username;
@@ -177,27 +152,10 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'g-recaptcha-response' => 'required',
         ], [
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
-            'g-recaptcha-response.required' => 'Silakan centang reCAPTCHA.',
         ]);
-
-        // Verify reCAPTCHA
-        try {
-            $recaptcha = new \ReCaptcha\ReCaptcha(config('services.recaptcha.secret_key'));
-            $resp = $recaptcha->verify($request->input('g-recaptcha-response'), $request->ip());
-            
-            if (!$resp->isSuccess() && config('app.env') !== 'local') {
-                return back()->withErrors(['g-recaptcha-response' => 'Verifikasi reCAPTCHA gagal.'])->withInput();
-            }
-        } catch (\Exception $e) {
-            \Log::error('reCAPTCHA error: ' . $e->getMessage());
-            if (config('app.env') !== 'local') {
-                return back()->withErrors(['g-recaptcha-response' => 'Tidak dapat memverifikasi reCAPTCHA.'])->withInput();
-            }
-        }
 
         // Find user by email
         $user = User::where('email', $request->email)->first();

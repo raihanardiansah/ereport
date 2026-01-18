@@ -98,7 +98,6 @@ class SchoolController extends Controller
                     ->numbers()
                     ->symbols(),
             ],
-            'g-recaptcha-response' => 'required',
         ], [
             'school_name.required' => 'Nama sekolah wajib diisi.',
             'school_email.unique' => 'Email sekolah sudah terdaftar.',
@@ -113,35 +112,7 @@ class SchoolController extends Controller
             'admin_password.mixed' => 'Password harus ada huruf besar dan kecil.',
             'admin_password.numbers' => 'Password harus ada angka.',
             'admin_password.symbols' => 'Password harus ada simbol.',
-            'g-recaptcha-response.required' => 'Silakan centang reCAPTCHA.',
         ]);
-
-
-        // Verify reCAPTCHA
-        try {
-            $recaptcha = new \ReCaptcha\ReCaptcha(config('services.recaptcha.secret_key'));
-            $resp = $recaptcha->verify($request->input('g-recaptcha-response'), $request->ip());
-            
-            if (!$resp->isSuccess()) {
-                // In local development, log the error but don't block registration
-                if (config('app.env') === 'local') {
-                    \Log::warning('reCAPTCHA verification failed in local environment', [
-                        'errors' => $resp->getErrorCodes()
-                    ]);
-                } else {
-                    return back()->withErrors(['g-recaptcha-response' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.'])->withInput();
-                }
-            }
-        } catch (\Exception $e) {
-            // Handle connection errors (timeout, network issues, etc.)
-            \Log::error('reCAPTCHA verification error: ' . $e->getMessage());
-            
-            // In production, show a user-friendly error
-            if (config('app.env') !== 'local') {
-                return back()->withErrors(['g-recaptcha-response' => 'Tidak dapat memverifikasi reCAPTCHA. Silakan coba lagi.'])->withInput();
-            }
-            // In local development, continue with registration
-        }
 
         DB::beginTransaction();
         

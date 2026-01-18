@@ -155,12 +155,7 @@
         </div>
 
         <!-- reCAPTCHA v2 -->
-        <div class="pt-2">
-            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-            @error('g-recaptcha-response')
-                <p class="mt-1 text-xs text-danger-600">{{ $message }}</p>
-            @enderror
-        </div>
+
 
         <!-- Submit -->
         <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 mt-6">

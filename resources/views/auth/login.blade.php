@@ -103,13 +103,7 @@
     }
 </script>
 
-        <!-- reCAPTCHA v2 -->
-        <div>
-            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-            @error('g-recaptcha-response')
-                <p class="mt-1 text-xs text-danger-600">{{ $message }}</p>
-            @enderror
-        </div>
+
 
         <!-- Remember Me & Forgot Password -->
         <div class="flex items-center justify-between text-sm">
