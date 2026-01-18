@@ -249,6 +249,17 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
                                 </a>
+                                <form method="POST" action="{{ route('users.reset-password', $user) }}" 
+                                      onsubmit="return confirm('Reset password pengguna ini ke default (Siswa123!)?')">
+                                    @csrf
+                                    <button type="submit" 
+                                            class="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                                            title="Reset Password">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11.542 16.516a1 1 0 01-.295.358l-2.545 1.543a1 1 0 01-.979-1.516l1.246-2.075a1 1 0 01.358-.295l1.767-1.728a4 4 0 004.848-6.104 2 2 0 01-3.697 0z"/>
+                                        </svg>
+                                    </button>
+                                </form>
                                 <form method="POST" action="{{ route('users.destroy', $user) }}" 
                                       onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')">
                                     @csrf

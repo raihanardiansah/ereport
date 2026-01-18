@@ -30,13 +30,20 @@ class DashboardController extends Controller
         // Analytics Data (Only for Admins/Management)
         $reportTrends = [];
         $categoryStats = [];
+        $pendingUsersCount = 0;
 
         if ($user->hasAnyRole(['super_admin', 'admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])) {
             $reportTrends = $this->getReportTrends($user);
             $categoryStats = $this->getCategoryStats($user);
         }
 
-        return view('dashboard.index', compact('stats', 'recentReports', 'reportTrends', 'categoryStats'));
+        if ($user->hasAnyRole(['admin_sekolah'])) {
+            $pendingUsersCount = User::where('school_id', $user->school_id)
+                ->where('is_approved', false)
+                ->count();
+        }
+
+        return view('dashboard.index', compact('stats', 'recentReports', 'reportTrends', 'categoryStats', 'pendingUsersCount'));
     }
 
     /**

@@ -488,4 +488,14 @@ class UserController extends Controller
 
         return redirect()->back()->with('success', 'Pengajuan pengguna ditolak dan dihapus.');
     }
+    public function resetPassword($id)
+    {
+        $user = User::where('school_id', auth()->user()->school_id)->findOrFail($id);
+        
+        // Default password: Siswa123!
+        $defaultPassword = 'Siswa123!';
+        $user->update(['password' => Hash::make($defaultPassword)]);
+
+        return redirect()->back()->with('success', "Password pengguna berhasil direset ke: $defaultPassword");
+    }
 }

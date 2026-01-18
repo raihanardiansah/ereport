@@ -163,6 +163,9 @@ Route::middleware(['auth', 'subscription'])->group(function () {
         // User Approval
         Route::post('/users/{user}/approve', [\App\Http\Controllers\UserController::class, 'approve'])->name('users.approve');
         Route::delete('/users/{user}/reject', [\App\Http\Controllers\UserController::class, 'reject'])->name('users.reject');
+        
+        // Password Reset by Admin
+        Route::post('/users/{user}/reset-password', [\App\Http\Controllers\UserController::class, 'resetPassword'])->name('users.reset-password');
     });
 
     // Analytics - Admin & Manajemen Sekolah

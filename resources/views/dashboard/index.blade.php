@@ -41,6 +41,34 @@
     </div>
     @endif
 
+    <!-- Pending Approval Alert -->
+    @if(isset($pendingUsersCount) && $pendingUsersCount > 0)
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800">
+                    Persetujuan Diperlukan: {{ $pendingUsersCount }} Kredensial Baru
+                </h3>
+                <div class="mt-2 text-sm text-yellow-700">
+                    <p>Ada siswa/guru baru yang mendaftar dan menunggu persetujuan Anda untuk bisa login.</p>
+                </div>
+                <div class="mt-4">
+                    <div class="-mx-2 -my-1.5 flex">
+                        <a href="{{ route('users.index') }}" class="px-3 py-2 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                            Kelola Pengguna &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Stats Cards -->
     <div x-data="{ loading: true }" x-init="setTimeout(() => loading = false, 1000)" class="mb-8">
         <!-- Skeleton Loading State -->
