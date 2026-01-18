@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Report;
 use App\Models\User;
-use App\Services\Notification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -79,8 +78,9 @@ class EscalateReports extends Command
 
         // Send escalation notification
         foreach ($recipients as $recipient) {
-            Notification::create([
+            \App\Models\Notification::create([
                 'user_id' => $recipient->id,
+                'school_id' => $report->school_id,
                 'title' => $this->getEscalationTitle($level),
                 'message' => $this->getEscalationMessage($report, $level),
                 'type' => 'escalation',
@@ -88,15 +88,18 @@ class EscalateReports extends Command
                     'report_id' => $report->id,
                     'escalation_level' => $level,
                 ],
-                'is_urgent' => true,
             ]);
         }
+
+        // Send email notification for escalated report
+        $hoursPending = now()->diffInHours($report->created_at);
+        \App\Services\EmailService::notifyReportEscalated($report, $hoursPending);
 
         Log::warning("Report escalated", [
             'report_id' => $report->id,
             'school_id' => $report->school_id,
             'level' => $level,
-            'hours_pending' => now()->diffInHours($report->created_at),
+            'hours_pending' => $hoursPending,
         ]);
     }
 
@@ -109,14 +112,10 @@ class EscalateReports extends Command
 
         if ($level === 1) {
             // Level 1: Notify all staf_kesiswaan and admin_sekolah
-            $query->whereHas('roles', function ($q) {
-                $q->whereIn('name', ['staf_kesiswaan', 'admin_sekolah']);
-            });
+            $query->whereIn('role', ['staf_kesiswaan', 'admin_sekolah']);
         } else {
             // Level 2: Notify manajemen_sekolah (Kepala Sekolah) and admin_sekolah
-            $query->whereHas('roles', function ($q) {
-                $q->whereIn('name', ['manajemen_sekolah', 'admin_sekolah']);
-            });
+            $query->whereIn('role', ['manajemen_sekolah', 'admin_sekolah']);
         }
 
         return $query->get();

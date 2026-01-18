@@ -26,7 +26,7 @@
 <body>
     <div class="container">
         <div class="header {{ $daysRemaining <= 0 ? 'expired' : '' }}">
-            <h1>{{ $daysRemaining <= 0 ? '⚠️ Langganan Telah Berakhir' : '⏰ Langganan Akan Berakhir' }}</h1>
+            <h1>{{ $daysRemaining <= 0 ? 'Langganan Telah Berakhir' : 'Langganan Akan Berakhir' }}</h1>
         </div>
         <div class="content">
             @if($daysRemaining <= 0)

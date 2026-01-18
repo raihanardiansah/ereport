@@ -23,7 +23,7 @@ class EmailService
         try {
             // Get school's admin and BK staff emails
             $recipients = User::where('school_id', $report->school_id)
-                ->whereIn('role', ['admin_sekolah', 'staf_kesiswaan'])
+                ->whereIn('role', ['admin_sekolah', 'manajemen_sekolah', 'staf_kesiswaan'])
                 ->where('id', '!=', $report->user_id) // Don't notify the reporter
                 ->whereNotNull('email')
                 ->pluck('email')
@@ -168,6 +168,111 @@ class EmailService
         } catch (\Exception $e) {
             Log::error('Failed to send weekly digest', [
                 'school_id' => $school->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Send email notification when report is assigned to a user.
+     */
+    public static function notifyReportAssigned(Report $report, User $assignedUser): void
+    {
+        try {
+            if (!$assignedUser->email) {
+                return;
+            }
+
+            Mail::to($assignedUser->email)->send(
+                new \App\Mail\ReportAssignedMail($report, $assignedUser)
+            );
+
+            Log::info('Report assigned email sent', [
+                'report_id' => $report->id,
+                'recipient' => $assignedUser->email
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send report assigned email', [
+                'report_id' => $report->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Send email notification when report is escalated due to no response.
+     */
+    public static function notifyReportEscalated(Report $report, int $hoursPending): void
+    {
+        try {
+            // Send to manajemen_sekolah and admin_sekolah
+            $recipients = User::where('school_id', $report->school_id)
+                ->whereIn('role', ['admin_sekolah', 'manajemen_sekolah'])
+                ->whereNotNull('email')
+                ->pluck('email')
+                ->toArray();
+
+            if (empty($recipients)) {
+                return;
+            }
+
+            foreach ($recipients as $email) {
+                Mail::to($email)->send(
+                    new \App\Mail\ReportEscalatedMail($report, $hoursPending)
+                );
+            }
+
+            Log::info('Report escalated emails sent', [
+                'report_id' => $report->id,
+                'recipients_count' => count($recipients),
+                'hours_pending' => $hoursPending
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send report escalated email', [
+                'report_id' => $report->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Send email notification when someone comments on a report.
+     */
+    public static function notifyReportComment(Report $report, \App\Models\ReportComment $comment): void
+    {
+        try {
+            // Notify the report creator (if not the commenter and comment is not private)
+            if (!$comment->is_private && $report->user_id !== $comment->user_id && $report->user->email) {
+                Mail::to($report->user->email)->send(
+                    new \App\Mail\ReportCommentMail($report, $comment)
+                );
+
+                Log::info('Report comment email sent to creator', [
+                    'report_id' => $report->id,
+                    'comment_id' => $comment->id,
+                    'recipient' => $report->user->email
+                ]);
+            }
+
+            // Also notify assigned user if exists and is not the commenter
+            if ($report->assigned_to && 
+                $report->assigned_to !== $comment->user_id && 
+                $report->assignedTo->email) {
+                
+                Mail::to($report->assignedTo->email)->send(
+                    new \App\Mail\ReportCommentMail($report, $comment)
+                );
+
+                Log::info('Report comment email sent to assigned user', [
+                    'report_id' => $report->id,
+                    'comment_id' => $comment->id,
+                    'recipient' => $report->assignedTo->email
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send report comment email', [
+                'report_id' => $report->id,
+                'comment_id' => $comment->id,
                 'error' => $e->getMessage()
             ]);
         }

@@ -116,7 +116,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚨 LAPORAN CRITICAL BARU</h1>
+            <h1>LAPORAN CRITICAL BARU</h1>
             <div class="badge">PERLU PERHATIAN SEGERA</div>
         </div>
 

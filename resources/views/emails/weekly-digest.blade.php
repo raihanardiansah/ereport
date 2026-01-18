@@ -30,7 +30,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Ringkasan Mingguan</h1>
+            <h1>Ringkasan Mingguan</h1>
             <p>{{ now()->subWeek()->format('d M') }} - {{ now()->format('d M Y') }}</p>
         </div>
         <div class="content">

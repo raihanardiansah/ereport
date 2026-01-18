@@ -78,6 +78,19 @@ Route::middleware(['auth', 'subscription'])->group(function () {
     Route::get('/settings', [\App\Http\Controllers\ProfileController::class, 'settings'])->name('settings');
     Route::put('/settings', [\App\Http\Controllers\ProfileController::class, 'updateSettings'])->name('settings.update');
     
+    // Auto-assignment Settings (Admin only)
+    Route::middleware(RoleMiddleware::class . ':admin_sekolah')->prefix('settings')->group(function () {
+        Route::get('/auto-assignment', [\App\Http\Controllers\CategoryAssignmentController::class, 'index'])->name('settings.auto-assignment');
+        Route::post('/auto-assignment', [\App\Http\Controllers\CategoryAssignmentController::class, 'store'])->name('settings.auto-assignment.store');
+        Route::delete('/auto-assignment/{assignment}', [\App\Http\Controllers\CategoryAssignmentController::class, 'destroy'])->name('settings.auto-assignment.destroy');
+    });
+
+    // Audit Logs (Admin & Manajemen only)
+    Route::middleware(RoleMiddleware::class . ':admin_sekolah,manajemen_sekolah')->group(function () {
+        Route::get('/audit-logs', [\App\Http\Controllers\AuditLogController::class, 'index'])->name('audit.index');
+        Route::get('/reports/{report}/audit', [\App\Http\Controllers\AuditLogController::class, 'show'])->name('audit.show');
+    });
+    
     // Role-specific dashboard routes
     Route::get('/dashboard/super-admin', [DashboardController::class, 'superAdmin'])
         ->middleware(RoleMiddleware::class . ':super_admin')

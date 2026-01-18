@@ -23,7 +23,7 @@ class AnonymousReportLimit extends Model
 
     /**
      * Check if device/IP can submit anonymous report today.
-     * Max 3 anonymous reports per device per day.
+     * Max 2 anonymous reports per device per day.
      */
     public static function canSubmitAnonymous(string $fingerprint, string $ip): bool
     {
@@ -35,7 +35,7 @@ class AnonymousReportLimit extends Model
             return true;
         }
 
-        return $limit->daily_count < 3;
+        return $limit->daily_count < 2;
     }
 
     /**
@@ -63,6 +63,6 @@ class AnonymousReportLimit extends Model
             ->where('date', now()->toDateString())
             ->first();
 
-        return 3 - ($limit?->daily_count ?? 0);
+        return 2 - ($limit?->daily_count ?? 0);
     }
 }

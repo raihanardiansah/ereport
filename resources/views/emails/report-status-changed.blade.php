@@ -28,7 +28,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔄 Status Laporan Diperbarui</h1>
+            <h1>Status Laporan Diperbarui</h1>
         </div>
         <div class="content">
             <p>Halo <strong>{{ $report->user->name }}</strong>,</p>

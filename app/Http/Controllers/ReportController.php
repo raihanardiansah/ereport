@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\AnonymousReportLimit;
+use App\Models\CategoryAssignment;
 use App\Models\Notification;
 use App\Models\Report;
+use App\Models\ReportAuditLog;
 use App\Models\User;
 use App\Services\EmailService;
 use App\Services\GamificationService;
@@ -196,7 +198,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
         if ($isAnonymous && $deviceFingerprint) {
             $ip = $request->ip();
             if (!AnonymousReportLimit::canSubmitAnonymous($deviceFingerprint, $ip)) {
-                return back()->withErrors(['is_anonymous' => 'Anda telah mencapai batas maksimal 3 laporan anonim per hari.'])->withInput();
+                return back()->withErrors(['is_anonymous' => 'Anda telah mencapai batas maksimal 2 laporan anonim per hari.'])->withInput();
             }
         }
 
@@ -284,6 +286,41 @@ public function __construct(SentimentAnalysisService $sentimentService)
         // Attach accused users (multi-accused support)
         if (!empty($accusedUserIds)) {
             $report->accusedUsers()->sync($accusedUserIds);
+        }
+
+        // Auto-assign based on category (if configured)
+        $autoAssignedUser = CategoryAssignment::getAssignedUser($user->school_id, $finalCategory);
+        if ($autoAssignedUser) {
+            $report->update(['assigned_to' => $autoAssignedUser->id]);
+            
+            // Notify assigned user
+            Notification::create([
+                'user_id' => $autoAssignedUser->id,
+                'school_id' => $report->school_id,
+                'type' => 'report_assigned',
+                'title' => 'Laporan Ditugaskan (Auto)',
+                'message' => "Anda ditugaskan untuk menangani laporan '{$report->title}' (kategori: {$finalCategory})",
+                'data' => ['report_id' => $report->id],
+            ]);
+
+            // Send email notification
+            EmailService::notifyReportAssigned($report, $autoAssignedUser);
+        }
+
+        // Audit log for critical/high reports
+        if (ReportAuditLog::shouldAudit($report)) {
+            ReportAuditLog::logAction(
+                $report,
+                $user,
+                'created',
+                'Report created with urgency: ' . $report->urgency,
+                [
+                    'category' => $finalCategory,
+                    'urgency' => $report->urgency,
+                    'is_anonymous' => $report->is_anonymous,
+                    'auto_assigned' => $autoAssignedUser ? true : false,
+                ]
+            );
         }
 
         // Send email notifications for CRITICAL reports (with rate limiting)
@@ -390,6 +427,20 @@ public function __construct(SentimentAnalysisService $sentimentService)
             
             // Send email notification
             EmailService::notifyReportStatusChanged($report, $oldStatus, $validated['status']);
+        }
+
+        // Audit log for critical/high reports
+        if (ReportAuditLog::shouldAudit($report)) {
+            ReportAuditLog::logAction(
+                $report,
+                $user,
+                'status_changed',
+                "Status changed from {$oldStatus} to {$validated['status']}",
+                [
+                    'old_status' => $oldStatus,
+                    'new_status' => $validated['status'],
+                ]
+            );
         }
 
         return back()->with('success', 'Status laporan berhasil diperbarui.');
@@ -543,7 +594,7 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'content.max' => 'Komentar maksimal 1000 karakter.',
         ]);
 
-        $report->comments()->create([
+        $comment = $report->comments()->create([
             'user_id' => $user->id,
             'content' => $validated['content'],
             'type' => $validated['type'],
@@ -561,6 +612,10 @@ public function __construct(SentimentAnalysisService $sentimentService)
                 'data' => ['report_id' => $report->id],
             ]);
         }
+
+        // Send email notification
+        EmailService::notifyReportComment($report, $comment);
+
 
         return back()->with('success', 'Komentar berhasil ditambahkan.');
     }
@@ -607,6 +662,10 @@ public function __construct(SentimentAnalysisService $sentimentService)
             'message' => "Anda ditugaskan untuk menangani laporan '{$report->title}'",
             'data' => ['report_id' => $report->id],
         ]);
+
+        // Send email notification
+        EmailService::notifyReportAssigned($report, $assignedUser);
+
 
         return back()->with('success', 'Laporan berhasil ditugaskan ke ' . $assignedUser->name);
     }

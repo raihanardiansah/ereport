@@ -9,18 +9,20 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class CriticalReportCreated extends Mailable
+class ReportEscalatedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public Report $report;
+    public int $hoursPending;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Report $report)
+    public function __construct(Report $report, int $hoursPending)
     {
         $this->report = $report;
+        $this->hoursPending = $hoursPending;
     }
 
     /**
@@ -29,7 +31,7 @@ class CriticalReportCreated extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Laporan Critical Baru - ' . $this->report->title,
+            subject: 'Eskalasi: Laporan Belum Ditangani - ' . $this->report->title,
         );
     }
 
@@ -39,18 +41,16 @@ class CriticalReportCreated extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.critical-report-created',
+            view: 'emails.report-escalated',
             with: [
                 'report' => $this->report,
-                'reportUrl' => route('reports.show', $this->report->id),
+                'hoursPending' => $this->hoursPending,
             ],
         );
     }
 
     /**
      * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
     public function attachments(): array
     {
