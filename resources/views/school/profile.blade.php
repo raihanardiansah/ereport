@@ -12,6 +12,22 @@
                 @method('PUT')
 
                 <div class="grid sm:grid-cols-2 gap-5">
+                    <div class="sm:col-span-2 bg-primary-50 border border-primary-200 rounded-xl p-4 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-semibold text-primary-900">Kode Gabung Sekolah (Join Code)</h3>
+                            <p class="text-xs text-primary-700 mt-1">Bagikan kode ini kepada siswa/guru untuk mendaftar mandiri.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <code class="px-3 py-1 bg-white border border-primary-300 rounded-lg text-lg font-mono font-bold text-primary-700 tracking-wider select-all">{{ $school->join_code }}</code>
+                            <button type="button" onclick="navigator.clipboard.writeText('{{ $school->join_code }}'); alert('Kode berhasil disalin!')" 
+                                class="p-2 text-primary-600 hover:bg-primary-100 rounded-lg transition-colors" title="Salin Kode">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Nama Sekolah *</label>
                         <input type="text" name="name" value="{{ old('name', $school->name) }}" required maxlength="100"
