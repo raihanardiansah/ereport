@@ -88,7 +88,7 @@ class QrCode extends Model
      */
     public function getUrlAttribute(): string
     {
-        return route('qr.report', $this->code);
+        return route('qr.scan', $this->code);
     }
 
     /**
