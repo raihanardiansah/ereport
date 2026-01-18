@@ -6,7 +6,7 @@
 
     <div class="grid lg:grid-cols-3 gap-8">
         <!-- Main Leaderboard -->
-        <div class="{{ auth()->user()->role === 'siswa' ? 'lg:col-span-2' : 'lg:col-span-3' }}">
+        <div class="lg:col-span-2">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">Top 10 Kontributor</h2>
@@ -26,7 +26,7 @@
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                             @foreach($leaderboard as $index => $player)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors {{ $player->id === $user->id ? 'bg-primary-50 dark:bg-primary-900/20' : '' }}">
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex items-center">
                                         @if($index === 0)
                                             <span class="text-2xl mr-2">🥇</span>
@@ -39,9 +39,9 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3">
                                     <div class="flex items-center">
-                                        <img class="h-10 w-10 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow-sm" 
+                                        <img class="h-10 w-10 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow-sm flex-shrink-0" 
                                             src="{{ $player->avatar_url }}" 
                                             alt="{{ $player->name }}"
                                             onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($player->name) }}&color=7F9CF5&background=EBF4FF'">
@@ -56,7 +56,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <td class="px-4 py-3 whitespace-nowrap text-center">
                                     @if($player->current_streak > 0)
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                                             🔥 {{ $player->current_streak }} Hari
@@ -65,7 +65,7 @@
                                         <span class="text-gray-400">-</span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <td class="px-4 py-3 whitespace-nowrap text-right">
                                     <span class="text-lg font-bold text-primary-600 dark:text-primary-400">{{ number_format($player->total_points) }}</span>
                                     <span class="text-xs text-gray-500">pts</span>
                                 </td>

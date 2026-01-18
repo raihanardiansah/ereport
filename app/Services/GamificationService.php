@@ -197,6 +197,7 @@ class GamificationService
     public function getSchoolLeaderboard(int $schoolId, int $limit = 10): \Illuminate\Support\Collection
     {
         return User::where('school_id', $schoolId)
+            ->where('role', 'siswa') // Only show students in leaderboard
             ->where('total_points', '>', 0)
             ->orderByDesc('total_points')
             ->limit($limit)
