@@ -32,7 +32,7 @@
 
     <div class="no-print mb-8 flex gap-4">
         <button onclick="window.print()"
-            class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">
+            class="bg-primary-600 hover:bg-primary-700 text-gray-800 font-bold py-2 px-6 rounded-lg shadow transition-colors">
             Print QR Code
         </button>
         <button onclick="window.close()"

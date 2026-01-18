@@ -29,20 +29,7 @@ class ContactController extends Controller
             'school_name' => 'nullable|string|max:100',
             'whatsapp' => 'nullable|string|max:20',
             'message' => 'required|string|max:2000',
-            'g-recaptcha-response' => 'required|string',
         ]);
-
-        // Verify ReCaptcha
-        $recaptcha = new \ReCaptcha\ReCaptcha(config('services.recaptcha.secret_key'));
-        $resp = $recaptcha->verify($request->input('g-recaptcha-response'), $request->ip());
-
-        if (!$resp->isSuccess()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi Captcha gagal. Silakan coba lagi.',
-                'errors' => $resp->getErrorCodes(),
-            ], 422);
-        }
 
         try {
             ContactMessage::create([
@@ -64,7 +51,7 @@ class ContactController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Contact form error: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Maaf, terjadi kesalahan. Silakan coba lagi atau hubungi kami langsung.',
@@ -78,7 +65,7 @@ class ContactController extends Controller
     public function supportPage()
     {
         $user = Auth::user();
-        
+
         // Get user's previous messages
         $myMessages = ContactMessage::where('user_id', $user->id)
             ->with(['replies', 'replies.user'])
@@ -133,7 +120,7 @@ class ContactController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Support form error: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Maaf, terjadi kesalahan. Silakan coba lagi.',
@@ -151,7 +138,7 @@ class ContactController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(20)
             ->get()
-            ->map(function($msg) {
+            ->map(function ($msg) {
                 return [
                     'id' => $msg->id,
                     'subject' => $msg->subject ?: $msg->type_label,
@@ -183,7 +170,7 @@ class ContactController extends Controller
         $message->load(['replies', 'replies.user', 'repliedByUser']);
 
         // Format replies
-        $replies = $message->replies->map(function($reply) {
+        $replies = $message->replies->map(function ($reply) {
             return [
                 'id' => $reply->id,
                 'message' => $reply->message,
@@ -293,11 +280,11 @@ class ContactController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('subject', 'like', "%{$search}%")
-                  ->orWhere('message', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('subject', 'like', "%{$search}%")
+                    ->orWhere('message', 'like', "%{$search}%");
             });
         }
 
@@ -319,7 +306,7 @@ class ContactController extends Controller
     {
         // Mark as read when viewing
         $message->markAsRead();
-        
+
         $message->load(['user', 'school', 'repliedByUser', 'replies.user']);
 
         return view('admin.messages.show', [
@@ -357,8 +344,8 @@ class ContactController extends Controller
                 $notePrefix = "[" . now()->format('d/m/Y H:i') . " - {$user->name}]\n";
                 $message->update([
                     'status' => ContactMessage::STATUS_IN_PROGRESS, // Don't mark as replied for notes
-                    'admin_notes' => ($message->admin_notes ? $message->admin_notes . "\n\n" : '') . 
-                                    $notePrefix . $validated['reply_message'],
+                    'admin_notes' => ($message->admin_notes ? $message->admin_notes . "\n\n" : '') .
+                        $notePrefix . $validated['reply_message'],
                 ]);
             } else {
                 // Create reply record
@@ -379,7 +366,7 @@ class ContactController extends Controller
             }
 
             // Send reply via selected channel and create notification
-            $channelLabel = match($validated['send_via']) {
+            $channelLabel = match ($validated['send_via']) {
                 'email' => 'Email',
                 'whatsapp' => 'WhatsApp',
                 'in_app' => 'Aplikasi',
@@ -388,21 +375,21 @@ class ContactController extends Controller
 
             if ($validated['send_via'] === 'email') {
                 // Send email reply
-                Mail::raw($validated['reply_message'], function($mail) use ($message) {
+                Mail::raw($validated['reply_message'], function ($mail) use ($message) {
                     $mail->to($message->email)
-                         ->from(self::SUPPORT_EMAIL, 'e-Report Support')
-                         ->subject('Re: ' . ($message->subject ?: 'Pesan Anda ke e-Report'));
+                        ->from(self::SUPPORT_EMAIL, 'e-Report Support')
+                        ->subject('Re: ' . ($message->subject ?: 'Pesan Anda ke e-Report'));
                 });
             } elseif ($validated['send_via'] === 'whatsapp') {
                 // For WhatsApp, we'll generate a link that admin can click
                 $waText = urlencode($validated['reply_message']);
                 $waNumber = preg_replace('/[^0-9]/', '', $message->phone ?: '');
-                
+
                 if ($waNumber) {
                     // Store the WhatsApp link for admin to click
                     $message->update([
-                        'admin_notes' => ($message->admin_notes ? $message->admin_notes . "\n\n" : '') . 
-                                        "[WhatsApp Reply Generated] wa.me/{$waNumber}?text={$waText}",
+                        'admin_notes' => ($message->admin_notes ? $message->admin_notes . "\n\n" : '') .
+                            "[WhatsApp Reply Generated] wa.me/{$waNumber}?text={$waText}",
                     ]);
                 }
             }
@@ -414,10 +401,10 @@ class ContactController extends Controller
                     'school_id' => $message->school_id,
                     'type' => 'support_reply',
                     'title' => 'Balasan dari Support',
-                    'message' => "Pesan Anda telah dibalas via {$channelLabel}. " . 
-                                 ($validated['send_via'] === 'in_app' 
-                                    ? 'Lihat balasan di halaman Hubungi Support.' 
-                                    : "Silakan cek {$channelLabel} Anda."),
+                    'message' => "Pesan Anda telah dibalas via {$channelLabel}. " .
+                        ($validated['send_via'] === 'in_app'
+                            ? 'Lihat balasan di halaman Hubungi Support.'
+                            : "Silakan cek {$channelLabel} Anda."),
                     'data' => [
                         'message_id' => $message->id,
                         'subject' => $message->subject,
@@ -442,7 +429,7 @@ class ContactController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Reply error: ' . $e->getMessage());
-            
+
             return back()->with('error', 'Gagal mengirim balasan: ' . $e->getMessage());
         }
     }
@@ -486,13 +473,13 @@ class ContactController extends Controller
     {
         $message->load(['replies.user']);
 
-        $replies = $message->replies->map(function($reply) {
+        $replies = $message->replies->map(function ($reply) {
             return [
                 'id' => $reply->id,
                 'message' => $reply->message,
                 'is_admin' => $reply->is_admin_reply,
-                'sender_name' => $reply->is_admin_reply 
-                    ? 'Admin Support' 
+                'sender_name' => $reply->is_admin_reply
+                    ? 'Admin Support'
                     : ($reply->user->name ?? 'User'),
                 'created_at' => $reply->created_at->format('d M Y, H:i'),
             ];

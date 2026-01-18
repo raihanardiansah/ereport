@@ -30,6 +30,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <script>
         // Initialize theme from localStorage before page renders to prevent flash
         // Default is light mode - only apply dark if explicitly saved
@@ -234,7 +235,7 @@
 
                         <a href="{{ route('settings.qr-codes.index') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors {{ request()->routeIs('settings.qr-codes*') ? 'bg-gray-800 text-white' : '' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4h-4v-2h4v-2m3 4h2v2h-2v-2zm-1-4h2v2h-2v-2zM6 20h2v2H6v-2zm-2-4h2v2H4v-2zm16-11h-2v2h2v-2zm-4 0h-2v2h2v-2zm-4 0h-2v2h2v-2zm-4 0h-2v2h2v-2zm-4 0H2v2h2V5zm16 11v-4h-4v4h4zm-8 4v-4H8v4h4zm8-8v-4h-4v4h4zm-8-4v-4H8v4h4zM8 5v4H4V5h4z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m-2 0h-2m-2-4H6m6 0v4m6-11V9m0 0h2m-2 0h-2M9 3h6m-6 0v2m0-2H6m9 0v2m0-2h3M9 3H6m0 0v3M6 3H3v3m3-3v3m0-3H3m6 18v-2m0 2v-2m0 2h3m-3 0h-3m9-18h3v3m0-3v3m0-3h-3M3 21v-3m0 0h3m-3 0v-3m0 3h3m18 0v-3m0 0h-3m3 0v-3m0 3h-3"/>
                             </svg>
                             QR Codes
                         </a>

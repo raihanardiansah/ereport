@@ -658,25 +658,29 @@ class ReportController extends Controller
             abort(403);
         }
 
+        // Determine which field to validate based on is_private
+        $isPrivate = $request->boolean('is_private');
+        $contentField = $isPrivate ? 'private_content' : 'content';
+
         $validated = $request->validate([
-            'content' => ['required', 'string', 'min:5', 'max:1000'],
+            $contentField => ['required', 'string', 'min:5', 'max:1000'],
             'type' => ['required', 'in:comment,follow_up,counseling_note,action_taken'],
             'is_private' => ['nullable', 'boolean'],
         ], [
-            'content.required' => 'Komentar tidak boleh kosong.',
-            'content.min' => 'Komentar minimal 5 karakter.',
-            'content.max' => 'Komentar maksimal 1000 karakter.',
+            $contentField . '.required' => 'Komentar tidak boleh kosong.',
+            $contentField . '.min' => 'Komentar minimal 5 karakter.',
+            $contentField . '.max' => 'Komentar maksimal 1000 karakter.',
         ]);
 
         $comment = $report->comments()->create([
             'user_id' => $user->id,
-            'content' => $validated['content'],
+            'content' => $validated[$contentField],
             'type' => $validated['type'],
-            'is_private' => $request->boolean('is_private'),
+            'is_private' => $isPrivate,
         ]);
 
         // Notify report creator if comment is not private
-        if (!$request->boolean('is_private') && $report->user_id !== $user->id) {
+        if (!$isPrivate && $report->user_id !== $user->id) {
             Notification::create([
                 'user_id' => $report->user_id,
                 'school_id' => $report->school_id,
@@ -691,7 +695,7 @@ class ReportController extends Controller
         EmailService::notifyReportComment($report, $comment);
 
 
-        return back()->with('success', 'Komentar berhasil ditambahkan.');
+        return back()->with('success', $isPrivate ? 'Catatan internal berhasil ditambahkan.' : 'Komentar berhasil ditambahkan.');
     }
 
     /**

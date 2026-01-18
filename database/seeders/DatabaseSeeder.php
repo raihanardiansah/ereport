@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Seed report templates first (global templates)
-        $this->call(ReportTemplateSeeder::class);
+        // $this->call(ReportTemplateSeeder::class);
         // Create Super Admin (no school)
         User::create([
             'name' => 'Super Admin',

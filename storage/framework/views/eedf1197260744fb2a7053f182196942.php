@@ -1,0 +1,309 @@
+<?php if (isset($component)) { $__componentOriginalfa710ee477a7171fb238cadd060c5959 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalfa710ee477a7171fb238cadd060c5959 = $attributes; } ?>
+<?php $component = App\View\Components\Layouts\App::resolve(['title' => 'QR Code Settings'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('layouts.app'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\Layouts\App::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+    <div class="space-y-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4v1m6 11h2m-6 0h-2v4m-2 0h-2m-2-4H6m6 0v4m6-11V9m0 0h2m-2 0h-2M9 3h6m-6 0v2m0-2H6m9 0v2m0-2h3M9 3H6m0 0v3M6 3H3v3m3-3v3m0-3H3m6 18v-2m0 2v-2m0 2h3m-3 0h-3m9-18h3v3m0-3v3m0-3h-3M3 21v-3m0 0h3m-3 0v-3m0 3h3m18 0v-3m0 0h-3m3 0v-3m0 3h-3" />
+                        </svg>
+                    </div>
+                    Pengaturan QR Code
+                </h1>
+                <p class="text-gray-600 mt-2">Kelola QR Code untuk pelaporan cepat berdasarkan lokasi</p>
+            </div>
+            <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-lg border border-indigo-200">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-sm text-indigo-700 font-medium"><?php echo e($qrCodes->total()); ?> QR Code Aktif</span>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Create Form -->
+            <div class="lg:col-span-1">
+                <div
+                    class="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-200 p-6 sticky top-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div
+                            class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-gray-900">Buat QR Code Baru</h2>
+                    </div>
+
+                    <form action="<?php echo e(route('settings.qr-codes.store')); ?>" method="POST" class="space-y-4">
+                        <?php echo csrf_field(); ?>
+
+                        <div>
+                            <?php if (isset($component)) { $__componentOriginal1f715251ca27813040dd69c48bb81eec = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1f715251ca27813040dd69c48bb81eec = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.forms.label','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('forms.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>Nama Lokasi <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1f715251ca27813040dd69c48bb81eec)): ?>
+<?php $attributes = $__attributesOriginal1f715251ca27813040dd69c48bb81eec; ?>
+<?php unset($__attributesOriginal1f715251ca27813040dd69c48bb81eec); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1f715251ca27813040dd69c48bb81eec)): ?>
+<?php $component = $__componentOriginal1f715251ca27813040dd69c48bb81eec; ?>
+<?php unset($__componentOriginal1f715251ca27813040dd69c48bb81eec); ?>
+<?php endif; ?>
+                            <?php if (isset($component)) { $__componentOriginal4fb6044c7ed6b655352043ff774efcd0 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4fb6044c7ed6b655352043ff774efcd0 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.forms.input','data' => ['name' => 'location_name','placeholder' => 'Contoh: Kantin, Toilet Lt 1','required' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('forms.input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['name' => 'location_name','placeholder' => 'Contoh: Kantin, Toilet Lt 1','required' => true]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4fb6044c7ed6b655352043ff774efcd0)): ?>
+<?php $attributes = $__attributesOriginal4fb6044c7ed6b655352043ff774efcd0; ?>
+<?php unset($__attributesOriginal4fb6044c7ed6b655352043ff774efcd0); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4fb6044c7ed6b655352043ff774efcd0)): ?>
+<?php $component = $__componentOriginal4fb6044c7ed6b655352043ff774efcd0; ?>
+<?php unset($__componentOriginal4fb6044c7ed6b655352043ff774efcd0); ?>
+<?php endif; ?>
+                            <p class="text-xs text-gray-500 mt-1">Nama lokasi yang akan muncul otomatis di laporan.</p>
+                        </div>
+
+                        <div>
+                            <?php if (isset($component)) { $__componentOriginal1f715251ca27813040dd69c48bb81eec = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1f715251ca27813040dd69c48bb81eec = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.forms.label','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('forms.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>Kategori Default (Opsional) <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1f715251ca27813040dd69c48bb81eec)): ?>
+<?php $attributes = $__attributesOriginal1f715251ca27813040dd69c48bb81eec; ?>
+<?php unset($__attributesOriginal1f715251ca27813040dd69c48bb81eec); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1f715251ca27813040dd69c48bb81eec)): ?>
+<?php $component = $__componentOriginal1f715251ca27813040dd69c48bb81eec; ?>
+<?php unset($__componentOriginal1f715251ca27813040dd69c48bb81eec); ?>
+<?php endif; ?>
+                            <select name="default_category"
+                                class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500 shadow-sm transition-colors">
+                                <option value="">- Pilih Kategori -</option>
+                                <?php $__currentLoopData = ['perilaku', 'akademik', 'kehadiran', 'bullying', 'konseling', 'kesehatan', 'fasilitas', 'prestasi', 'keamanan', 'ekstrakurikuler', 'sosial', 'keuangan', 'kebersihan', 'kantin', 'transportasi', 'teknologi', 'guru', 'kurikulum', 'perpustakaan', 'laboratorium', 'olahraga', 'keagamaan', 'saran', 'lainnya']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($cat); ?>"><?php echo e(ucfirst($cat)); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Kategori akan otomatis terisi jika dipilih.</p>
+                        </div>
+
+                        <div>
+                            <?php if (isset($component)) { $__componentOriginal1f715251ca27813040dd69c48bb81eec = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1f715251ca27813040dd69c48bb81eec = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.forms.label','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('forms.label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>Deskripsi (Opsional) <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1f715251ca27813040dd69c48bb81eec)): ?>
+<?php $attributes = $__attributesOriginal1f715251ca27813040dd69c48bb81eec; ?>
+<?php unset($__attributesOriginal1f715251ca27813040dd69c48bb81eec); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1f715251ca27813040dd69c48bb81eec)): ?>
+<?php $component = $__componentOriginal1f715251ca27813040dd69c48bb81eec; ?>
+<?php unset($__componentOriginal1f715251ca27813040dd69c48bb81eec); ?>
+<?php endif; ?>
+                            <textarea name="description" rows="2"
+                                class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500 shadow-sm transition-colors"
+                                placeholder="Catatan tambahan..."></textarea>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:scale-[1.02]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            Generate QR Code
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            </svg>
+                            Daftar QR Code Aktif
+                        </h2>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Lokasi / Kode</th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Kategori</th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Statistik</th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <?php $__empty_1 = true; $__currentLoopData = $qrCodes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $qr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <img class="h-10 w-10 rounded"
+                                                        src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=<?php echo e($qr->url); ?>"
+                                                        alt="">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900"><?php echo e($qr->location_name); ?>
+
+                                                    </div>
+                                                    <div class="text-sm text-gray-500 font-mono"><?php echo e($qr->code); ?></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <?php if($qr->default_category): ?>
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    <?php echo e(ucfirst($qr->default_category)); ?>
+
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-gray-400 text-sm">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <div class="flex flex-col">
+                                                <span>Scanning: <strong><?php echo e($qr->scan_count); ?></strong></span>
+                                                <span class="text-xs">
+                                                    Last:
+                                                    <?php echo e($qr->last_scanned_at ? $qr->last_scanned_at->diffForHumans() : '-'); ?>
+
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex justify-end gap-2">
+                                                <a href="<?php echo e(route('settings.qr-codes.show', $qr)); ?>" target="_blank"
+                                                    class="text-primary-600 hover:text-primary-900 flex items-center gap-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                    </svg>
+                                                    Print
+                                                </a>
+                                                <form action="<?php echo e(route('settings.qr-codes.destroy', $qr)); ?>" method="POST"
+                                                    onsubmit="return confirm('Hapus QR Code ini? Link lama tidak akan berfungsi lagi.')">
+                                                    <?php echo csrf_field(); ?>
+                                                    <?php echo method_field('DELETE'); ?>
+                                                    <button type="submit"
+                                                        class="text-red-600 hover:text-red-900 ml-2">Hapus</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-16">
+                                            <div class="text-center">
+                                                <div
+                                                    class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
+                                                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                </div>
+                                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Belum Ada QR Code</h3>
+                                                <p class="text-gray-500 mb-4">Buat QR Code pertama Anda untuk memudahkan
+                                                    pelaporan berdasarkan lokasi</p>
+                                                <div
+                                                    class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-sm">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Gunakan form di sebelah kiri untuk membuat QR Code
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <?php if($qrCodes->hasPages()): ?>
+                        <div class="px-6 py-4 border-t border-gray-100">
+                            <?php echo e($qrCodes->links()); ?>
+
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalfa710ee477a7171fb238cadd060c5959)): ?>
+<?php $attributes = $__attributesOriginalfa710ee477a7171fb238cadd060c5959; ?>
+<?php unset($__attributesOriginalfa710ee477a7171fb238cadd060c5959); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalfa710ee477a7171fb238cadd060c5959)): ?>
+<?php $component = $__componentOriginalfa710ee477a7171fb238cadd060c5959; ?>
+<?php unset($__componentOriginalfa710ee477a7171fb238cadd060c5959); ?>
+<?php endif; ?><?php /**PATH /var/www/html/resources/views/settings/qr-codes/index.blade.php ENDPATH**/ ?>

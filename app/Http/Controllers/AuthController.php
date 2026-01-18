@@ -28,13 +28,6 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // Debug: Log what we receive
-        \Log::info('Login attempt', [
-            'has_g-recaptcha-response' => $request->has('g-recaptcha-response'),
-            'g-recaptcha-response_value' => $request->input('g-recaptcha-response'),
-            'g-recaptcha-response_length' => strlen($request->input('g-recaptcha-response', '')),
-        ]);
-
         $request->validate([
             'username' => [
                 'required',

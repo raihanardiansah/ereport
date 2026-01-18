@@ -19,14 +19,14 @@ class SubscriptionController extends Controller
     public function index()
     {
         $school = auth()->user()->school;
-        
+
         // Get active packages ordered by sort_order then price
         // Hide trial packages from users who are not eligible
         $packages = SubscriptionPackage::where('is_active', true)
             ->orderBy('sort_order')
             ->orderBy('price')
             ->get()
-            ->filter(function($package) use ($school) {
+            ->filter(function ($package) use ($school) {
                 // Hide trial packages from users who are not eligible
                 $isTrial = $package->is_trial || $package->price == 0;
                 if ($isTrial && !$school->isEligibleForTrial()) {
@@ -35,15 +35,17 @@ class SubscriptionController extends Controller
                 return true;
             })
             ->values(); // Reset array keys after filter
-        
+
         // Get current active subscription - get the LATEST one to show upgrades correctly
         $currentSubscription = Subscription::where('school_id', $school->id)
             ->where('status', 'active')
             ->where('expires_at', '>', now())
-            ->with(['package' => function($q) {
-                // Always get fresh package data, no cache
-                $q->select('*');
-            }])
+            ->with([
+                'package' => function ($q) {
+                    // Always get fresh package data, no cache
+                    $q->select('*');
+                }
+            ])
             ->orderByDesc('created_at') // Get the most recent subscription
             ->first();
 
@@ -54,7 +56,7 @@ class SubscriptionController extends Controller
             $totalDays = (int) $currentSubscription->starts_at->diffInDays($currentSubscription->expires_at);
             $daysUsed = (int) $currentSubscription->starts_at->diffInDays(now());
             $progressPercent = $totalDays > 0 ? min(100, ($daysUsed / $totalDays) * 100) : 0;
-            
+
             $subscriptionInfo = [
                 'days_remaining' => max(0, $daysRemaining),
                 'days_total' => $totalDays,
@@ -103,7 +105,7 @@ class SubscriptionController extends Controller
     public function selectPackage()
     {
         $school = auth()->user()->school;
-        
+
         // Get current active subscription
         $currentSubscription = Subscription::where('school_id', $school->id)
             ->where('status', 'active')
@@ -111,13 +113,13 @@ class SubscriptionController extends Controller
             ->with('package')
             ->orderByDesc('created_at')
             ->first();
-        
+
         // Get all active packages
         $packages = SubscriptionPackage::where('is_active', true)
             ->orderBy('sort_order')
             ->orderBy('price')
             ->get()
-            ->filter(function($package) use ($school) {
+            ->filter(function ($package) use ($school) {
                 // Hide trial packages from users who are not eligible
                 $isTrial = $package->is_trial || $package->price == 0;
                 if ($isTrial && !$school->isEligibleForTrial()) {
@@ -125,31 +127,31 @@ class SubscriptionController extends Controller
                 }
                 return true;
             })
-            ->map(function($package) use ($school, $currentSubscription) {
+            ->map(function ($package) use ($school, $currentSubscription) {
                 // Check downgrade status
                 $isDowngrade = $currentSubscription && $currentSubscription->isDowngrade($package);
                 $canDowngrade = $currentSubscription ? $currentSubscription->canDowngradeTo($package) : true;
-                
+
                 // Determine if package is available
                 $isAvailable = true;
                 $unavailableReason = null;
-                
+
                 if ($isDowngrade && !$canDowngrade) {
                     $isAvailable = false;
                     $unavailableReason = $currentSubscription->getDowngradeBlockReason();
                 }
-                
+
                 // Add metadata to package
                 $package->is_available = $isAvailable;
                 $package->unavailable_reason = $unavailableReason;
                 $package->is_downgrade = $isDowngrade;
                 $package->is_upgrade = $currentSubscription && $package->price > $currentSubscription->package->price;
                 $package->is_current = $currentSubscription && $package->id == $currentSubscription->package_id;
-                
+
                 return $package;
             })
             ->values(); // Reset array keys after filter
-        
+
         // Trial eligibility info
         $trialEligibility = [
             'is_eligible' => $school->isEligibleForTrial(),
@@ -178,7 +180,7 @@ class SubscriptionController extends Controller
         // Check if promo code was applied
         if ($request->has('promo_code')) {
             $promo = Promotion::where('code', strtoupper($request->promo_code))->first();
-            
+
             if ($promo && $promo->isValid() && $promo->canBeUsedBy($school->id) && $promo->appliesToPackage($package->id)) {
                 $promoDiscount = $promo->calculateDiscount($package->price);
                 $promoCode = $promo->code;
@@ -398,10 +400,10 @@ class SubscriptionController extends Controller
 
         // Generate PDF using DomPDF
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('subscriptions.invoice-pdf', compact('transaction'));
-        
+
         // Set paper size and orientation
         $pdf->setPaper('a4', 'portrait');
-        
+
         // Download the PDF
         return $pdf->download('invoice-' . $transaction->order_id . '.pdf');
     }
@@ -429,43 +431,6 @@ class SubscriptionController extends Controller
      */
     public function unsubscribe(Request $request)
     {
-        // Validate reCAPTCHA
-        $recaptchaToken = $request->input('g-recaptcha-response');
-        if (!$recaptchaToken) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Silakan centang reCAPTCHA.'
-            ], 422);
-        }
-
-        try {
-            $recaptcha = new \ReCaptcha\ReCaptcha(config('services.recaptcha.secret_key'));
-            $resp = $recaptcha->verify($recaptchaToken, $request->ip());
-            
-            if (!$resp->isSuccess()) {
-                // In local development, log the error but don't block
-                if (config('app.env') === 'local') {
-                    \Log::warning('reCAPTCHA verification failed in local environment (unsubscribe)', [
-                        'errors' => $resp->getErrorCodes()
-                    ]);
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'error' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.'
-                    ], 422);
-                }
-            }
-        } catch (\Exception $e) {
-            \Log::error('reCAPTCHA verification error (unsubscribe): ' . $e->getMessage());
-            
-            if (config('app.env') !== 'local') {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'Tidak dapat memverifikasi reCAPTCHA. Silakan coba lagi.'
-                ], 500);
-            }
-        }
-
         // Validate password
         $password = $request->input('password');
         if (!$password) {
@@ -485,21 +450,21 @@ class SubscriptionController extends Controller
 
         try {
             $school = auth()->user()->school;
-            
+
             // Find active subscription with package relationship
             $subscription = Subscription::with('package')
                 ->where('school_id', $school->id)
                 ->where('status', 'active')
                 ->where('expires_at', '>', now())
                 ->first();
-            
+
             if (!$subscription) {
                 return response()->json([
                     'success' => false,
                     'error' => 'Tidak ada langganan aktif yang ditemukan'
                 ], 404);
             }
-            
+
             // Log before update
             \Log::info('Unsubscribe - Before Update', [
                 'subscription_id' => $subscription->id,
@@ -508,16 +473,16 @@ class SubscriptionController extends Controller
                 'old_expires_at' => $subscription->expires_at->toDateTimeString(),
                 'now' => now()->toDateTimeString()
             ]);
-            
+
             // Cancel the subscription immediately by setting expires_at to now
             $subscription->update([
                 'status' => 'cancelled',
                 'expires_at' => now() // Set to now so it's immediately expired
             ]);
-            
+
             // Refresh to get updated values
             $subscription->refresh();
-            
+
             // Log after update
             \Log::info('Unsubscribe - After Update', [
                 'subscription_id' => $subscription->id,
@@ -525,12 +490,12 @@ class SubscriptionController extends Controller
                 'new_expires_at' => $subscription->expires_at->toDateTimeString(),
                 'is_future' => $subscription->expires_at->isFuture() ? 'YES' : 'NO'
             ]);
-            
+
             // Update school subscription status
             $school->update([
                 'subscription_status' => 'expired'
             ]);
-            
+
             // Create audit log
             $packageName = $subscription->package ? $subscription->package->name : 'Unknown Package';
             AuditLog::create([
@@ -542,10 +507,10 @@ class SubscriptionController extends Controller
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent()
             ]);
-            
+
             // Clear any subscription-related session data
             session()->forget(['subscription_expired', 'subscription_expired_reason']);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Langganan berhasil diberhentikan'
