@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,10 @@
     <title><?php echo e($title ?? 'Login'); ?> - e-Report</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
-    
+
     <!-- reCAPTCHA v2 Script -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
@@ -18,6 +20,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .gradient-bg::before {
             content: '';
             position: absolute;
@@ -25,28 +28,40 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: 
+            background:
                 radial-gradient(ellipse 40% 60% at 30% 40%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
                 radial-gradient(ellipse 50% 40% at 70% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
             animation: float 20s ease-in-out infinite;
         }
+
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(3%, 3%) rotate(2deg); }
-            66% { transform: translate(-2%, 2%) rotate(-1deg); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(3%, 3%) rotate(2deg);
+            }
+
+            66% {
+                transform: translate(-2%, 2%) rotate(-1deg);
+            }
         }
     </style>
 </head>
-<body class="antialiased bg-white min-h-screen">
-    <div class="min-h-screen flex">
-        <!-- Left Side - Gradient Background -->
-        <div class="hidden md:flex md:w-1/2 gradient-bg relative">
+
+<body class="antialiased bg-white">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Left Side - Gradient Background (Fixed) -->
+        <div class="hidden md:block md:w-1/2 gradient-bg relative h-screen overflow-hidden">
             <div class="absolute inset-0 flex flex-col justify-center items-center px-8 py-12 text-white">
                 <!-- Logo -->
                 <div class="absolute top-6 left-6 flex items-center">
                     <img src="https://i.ibb.co.com/bgHHDbVR/Logo-1-1.png" alt="Logo" class="h-8">
                 </div>
-                
+
                 <!-- Main Text -->
                 <div class="text-center">
                     <h1 class="text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
@@ -63,7 +78,8 @@
                         <span>© <?php echo e(date('Y')); ?> e-Report</span>
                         <a href="/" class="hover:text-white transition-colors flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                             Beranda
                         </a>
@@ -72,26 +88,29 @@
             </div>
         </div>
 
-        <!-- Right Side - Form -->
-        <div class="w-full md:w-1/2 flex items-center justify-center px-6 py-8 md:px-12 bg-white">
-            <div class="w-full max-w-sm">
-                <!-- Mobile Logo -->
-                <div class="md:hidden flex items-center justify-center mb-6">
-                    <img src="https://i.ibb.co.com/bgHHDbVR/Logo-1-1.png" alt="Logo" class="h-8">
-                </div>
+        <!-- Right Side - Form (Scrollable) -->
+        <div class="w-full md:w-1/2 h-screen overflow-y-auto bg-white">
+            <div class="min-h-screen flex items-center justify-center px-6 py-12 md:px-12">
+                <div class="w-full max-w-sm">
+                    <!-- Mobile Logo -->
+                    <div class="md:hidden flex items-center justify-center mb-6">
+                        <img src="https://i.ibb.co.com/bgHHDbVR/Logo-1-1.png" alt="Logo" class="h-8">
+                    </div>
 
-                <?php echo e($slot ?? ''); ?>
+                    <?php echo e($slot ?? ''); ?>
 
-                <?php echo $__env->yieldContent('content'); ?>
+                    <?php echo $__env->yieldContent('content'); ?>
 
-                <!-- Mobile Back Link -->
-                <div class="md:hidden mt-6 text-center">
-                    <a href="/" class="text-gray-400 hover:text-gray-600 text-sm inline-flex items-center">
-                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        Kembali ke Beranda
-                    </a>
+                    <!-- Mobile Back Link -->
+                    <div class="md:hidden mt-6 text-center">
+                        <a href="/" class="text-gray-400 hover:text-gray-600 text-sm inline-flex items-center">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Kembali ke Beranda
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,7 +131,7 @@
             // Create toast element
             const toast = document.createElement('div');
             toast.className = `transform translate-x-full transition-all duration-300 ease-out opacity-0`;
-            
+
             // Set colors based on type
             let bgColor, borderColor, textColor, icon;
             if (type === 'success') {
@@ -182,7 +201,7 @@
                 if (progressBar) {
                     progressBar.style.width = percentage + '%';
                 }
-                
+
                 if (currentStep >= steps) {
                     clearInterval(countdown);
                 }
@@ -197,5 +216,5 @@
         }
     </script>
 </body>
-</html>
-<?php /**PATH /var/www/html/resources/views/layouts/guest.blade.php ENDPATH**/ ?>
+
+</html><?php /**PATH /var/www/html/resources/views/layouts/guest.blade.php ENDPATH**/ ?>

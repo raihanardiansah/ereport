@@ -14,6 +14,7 @@ class School extends Model
         'name',
         'email',
         'npsn',
+        'join_code',
         'phone',
         'address',
         'province',
@@ -35,6 +36,31 @@ class School extends Model
         'has_used_trial' => 'boolean',
         'allow_benchmarking' => 'boolean',
     ];
+
+    /**
+     * Bootstrap the model and its traits.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (School $school) {
+            if (empty($school->join_code)) {
+                $school->join_code = static::generateUniqueJoinCode();
+            }
+        });
+    }
+
+    /**
+     * Generate a unique join code.
+     */
+    public static function generateUniqueJoinCode(): string
+    {
+        do {
+            // Generate 6 character random string (uppercase letters and numbers)
+            $code = strtoupper(substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 6));
+        } while (static::where('join_code', $code)->exists());
+
+        return $code;
+    }
 
     /**
      * Get all users belonging to this school.

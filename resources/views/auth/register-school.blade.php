@@ -2,12 +2,39 @@
     <!-- Header -->
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900">Daftar Sekolah</h1>
-        <p class="text-gray-500 mt-2">Mulai dengan 7 hari percobaan gratis!</p>
+        <p class="text-gray-500 mt-1 text-sm">Mulai dengan 7 hari percobaan gratis!</p>
     </div>
 
-    @if(session('error'))
+    {{-- Success Message --}}
+    @if(session('success'))
+        <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm flex items-start gap-2">
+            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    {{-- Global Error Alert --}}
+    @if($errors->any())
         <div class="mb-4 p-3 bg-danger-50 border border-danger-200 text-danger-700 rounded-lg text-sm">
-            {{ session('error') }}
+            <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd" />
+                </svg>
+                <div>
+                    <p class="font-medium">Oops! Ada kesalahan:</p>
+                    <ul class="mt-1 list-disc list-inside space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
         </div>
     @endif
 
@@ -17,7 +44,7 @@
         <!-- School Info Section -->
         <div class="pb-4 border-b border-gray-100">
             <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Informasi Sekolah</h2>
-            
+
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Sekolah *</label>
@@ -84,7 +111,7 @@
         <!-- Admin Info Section -->
         <div class="pt-2">
             <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Akun Admin Sekolah</h2>
-            
+
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Admin *</label>
@@ -120,13 +147,19 @@
                             <input type="password" name="admin_password" id="admin_password" required minlength="8"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 pr-10 @error('admin_password') border-danger-500 @enderror"
                                 placeholder="••••••••">
-                            <button type="button" onclick="togglePassword('admin_password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
-                                <svg id="eye-icon-admin_password" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            <button type="button" onclick="togglePassword('admin_password')"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                <svg id="eye-icon-admin_password" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                                <svg id="eye-off-icon-admin_password" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.05 10.05 0 01-1.557 2.888m1.977-4.464L21 21" />
+                                <svg id="eye-off-icon-admin_password" class="h-5 w-5 hidden" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.05 10.05 0 01-1.557 2.888m1.977-4.464L21 21" />
                                 </svg>
                             </button>
                         </div>
@@ -136,16 +169,23 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password *</label>
                         <div class="relative">
-                            <input type="password" name="admin_password_confirmation" id="admin_password_confirmation" required
+                            <input type="password" name="admin_password_confirmation" id="admin_password_confirmation"
+                                required
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 pr-10"
                                 placeholder="••••••••">
-                            <button type="button" onclick="togglePassword('admin_password_confirmation')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
-                                <svg id="eye-icon-admin_password_confirmation" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            <button type="button" onclick="togglePassword('admin_password_confirmation')"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                <svg id="eye-icon-admin_password_confirmation" class="h-5 w-5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                                <svg id="eye-off-icon-admin_password_confirmation" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.05 10.05 0 01-1.557 2.888m1.977-4.464L21 21" />
+                                <svg id="eye-off-icon-admin_password_confirmation" class="h-5 w-5 hidden" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.05 10.05 0 01-1.557 2.888m1.977-4.464L21 21" />
                                 </svg>
                             </button>
                         </div>
@@ -158,140 +198,142 @@
 
 
         <!-- Submit -->
-        <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 mt-6">
+        <button type="submit"
+            class="w-full bg-gradient-to-r from-[#3CB371] to-[#00B4D8] hover:from-[#2E8B57] hover:to-[#0096C7] text-white font-semibold py-2.5 px-4 rounded-lg transition-all flex items-center justify-center gap-2 text-sm mt-6">
             Daftar Sekarang
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
         </button>
 
-        <p class="text-center text-sm text-gray-500 mt-4">
-            Dengan mendaftar, Anda menyetujui <a href="#" class="text-primary-600 hover:underline">Syarat & Ketentuan</a> kami.
+        <p class="text-center text-xs text-gray-500 mt-4">
+            Dengan mendaftar, Anda menyetujui <a href="#" class="text-[#00B4D8] hover:underline">Syarat & Ketentuan</a>
+            kami.
         </p>
     </form>
 
     <div class="mt-6 text-center">
-        <p class="text-gray-600">
+        <p class="text-sm text-gray-600">
             Sudah punya akun?
-            <a href="{{ route('login') }}" class="text-primary-600 hover:text-primary-700 font-semibold">Login</a>
+            <a href="{{ route('login') }}" class="text-[#00B4D8] hover:text-[#155E75] font-semibold">Login</a>
         </p>
     </div>
 
-<script>
-    function togglePassword(inputId) {
-        const input = document.getElementById(inputId);
-        const eye = document.getElementById('eye-icon-' + inputId);
-        const eyeOff = document.getElementById('eye-off-icon-' + inputId);
-        
-        if (input.type === 'password') {
-            input.type = 'text';
-            eye.classList.add('hidden');
-            eyeOff.classList.remove('hidden');
-        } else {
-            input.type = 'password';
-            eye.classList.remove('hidden');
-            eyeOff.classList.add('hidden');
-        }
-    }
+    <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById('eye-icon-' + inputId);
+            const eyeOff = document.getElementById('eye-off-icon-' + inputId);
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        const provinceSelect = document.getElementById('province-select');
-        const citySelect = document.getElementById('city-select');
-        
-        // Helper to convert to Title Case
-        const toTitleCase = (str) => {
-            return str.replace(/\w\S*/g, (txt) => {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            });
-        };
-
-        // Old values from Laravel
-        const oldProvince = "{{ old('province') }}";
-        const oldCity = "{{ old('city') }}";
-
-        try {
-            // Fetch Provinces
-            const response = await fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json');
-            let provinces = await response.json();
-            
-            // Sort alphabetically
-            provinces.sort((a, b) => a.name.localeCompare(b.name));
-
-            provinces.forEach(province => {
-                const option = document.createElement('option');
-                const name = toTitleCase(province.name);
-                option.value = name;
-                option.textContent = name;
-                option.dataset.id = province.id;
-                
-                if (oldProvince && oldProvince === name) {
-                    option.selected = true;
-                }
-                
-                provinceSelect.appendChild(option);
-            });
-
-            // Trigger change if we have an old province to load cities
-            if (oldProvince) {
-                // Find selected option to get ID
-                const selectedOption = Array.from(provinceSelect.options).find(opt => opt.value === oldProvince);
-                if (selectedOption) {
-                    loadCities(selectedOption.dataset.id, oldCity);
-                }
-            }
-
-        } catch (error) {
-            console.error('Error fetching provinces:', error);
-            provinceSelect.innerHTML += '<option value="">Gagal memuat data</option>';
-        }
-
-        // Listener for Province Change
-        provinceSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const provinceId = selectedOption.dataset.id;
-            
-            if (provinceId) {
-                loadCities(provinceId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.add('hidden');
+                eyeOff.classList.remove('hidden');
             } else {
-                citySelect.innerHTML = '<option value="">Pilih Provinsi Terlebih Dahulu</option>';
-                citySelect.disabled = true;
-                citySelect.classList.add('bg-gray-50', 'text-gray-500');
+                input.type = 'password';
+                eye.classList.remove('hidden');
+                eyeOff.classList.add('hidden');
             }
-        });
+        }
 
-        async function loadCities(provinceId, selectedCity = null) {
-            citySelect.innerHTML = '<option value="">Loading...</option>';
-            citySelect.disabled = true;
-            citySelect.classList.remove('bg-gray-50', 'text-gray-500');
+        document.addEventListener('DOMContentLoaded', async () => {
+            const provinceSelect = document.getElementById('province-select');
+            const citySelect = document.getElementById('city-select');
+
+            // Helper to convert to Title Case
+            const toTitleCase = (str) => {
+                return str.replace(/\w\S*/g, (txt) => {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                });
+            };
+
+            // Old values from Laravel
+            const oldProvince = "{{ old('province') }}";
+            const oldCity = "{{ old('city') }}";
 
             try {
-                const response = await fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provinceId}.json`);
-                let regencies = await response.json();
-                
-                // Sort alphabetically
-                regencies.sort((a, b) => a.name.localeCompare(b.name));
+                // Fetch Provinces
+                const response = await fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json');
+                let provinces = await response.json();
 
-                citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
-                
-                regencies.forEach(regency => {
+                // Sort alphabetically
+                provinces.sort((a, b) => a.name.localeCompare(b.name));
+
+                provinces.forEach(province => {
                     const option = document.createElement('option');
-                    const name = toTitleCase(regency.name);
+                    const name = toTitleCase(province.name);
                     option.value = name;
                     option.textContent = name;
-                    
-                    if (selectedCity && selectedCity === name) {
+                    option.dataset.id = province.id;
+
+                    if (oldProvince && oldProvince === name) {
                         option.selected = true;
                     }
-                    
-                    citySelect.appendChild(option);
+
+                    provinceSelect.appendChild(option);
                 });
-                
-                citySelect.disabled = false;
+
+                // Trigger change if we have an old province to load cities
+                if (oldProvince) {
+                    // Find selected option to get ID
+                    const selectedOption = Array.from(provinceSelect.options).find(opt => opt.value === oldProvince);
+                    if (selectedOption) {
+                        loadCities(selectedOption.dataset.id, oldCity);
+                    }
+                }
+
             } catch (error) {
-                console.error('Error fetching regencies:', error);
-                citySelect.innerHTML = '<option value="">Gagal memuat kota</option>';
+                console.error('Error fetching provinces:', error);
+                provinceSelect.innerHTML += '<option value="">Gagal memuat data</option>';
             }
-        }
-    });
-</script>
+
+            // Listener for Province Change
+            provinceSelect.addEventListener('change', function () {
+                const selectedOption = this.options[this.selectedIndex];
+                const provinceId = selectedOption.dataset.id;
+
+                if (provinceId) {
+                    loadCities(provinceId);
+                } else {
+                    citySelect.innerHTML = '<option value="">Pilih Provinsi Terlebih Dahulu</option>';
+                    citySelect.disabled = true;
+                    citySelect.classList.add('bg-gray-50', 'text-gray-500');
+                }
+            });
+
+            async function loadCities(provinceId, selectedCity = null) {
+                citySelect.innerHTML = '<option value="">Loading...</option>';
+                citySelect.disabled = true;
+                citySelect.classList.remove('bg-gray-50', 'text-gray-500');
+
+                try {
+                    const response = await fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provinceId}.json`);
+                    let regencies = await response.json();
+
+                    // Sort alphabetically
+                    regencies.sort((a, b) => a.name.localeCompare(b.name));
+
+                    citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+
+                    regencies.forEach(regency => {
+                        const option = document.createElement('option');
+                        const name = toTitleCase(regency.name);
+                        option.value = name;
+                        option.textContent = name;
+
+                        if (selectedCity && selectedCity === name) {
+                            option.selected = true;
+                        }
+
+                        citySelect.appendChild(option);
+                    });
+
+                    citySelect.disabled = false;
+                } catch (error) {
+                    console.error('Error fetching regencies:', error);
+                    citySelect.innerHTML = '<option value="">Gagal memuat kota</option>';
+                }
+            }
+        });
+    </script>
 </x-layouts.guest>

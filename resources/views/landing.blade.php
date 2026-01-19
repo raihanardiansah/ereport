@@ -182,7 +182,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20 relative">
                 <!-- Logo -->
-                <div class="flex items-center">
+                <div class="flex items-center pl-4">
                     <img src="https://i.ibb.co.com/bgHHDbVR/Logo-1-1.png" alt="Logo" class="h-11">
                 </div>
 
@@ -191,24 +191,30 @@
                     <a href="#home" class="text-gray-300 hover:text-white font-medium transition-colors">Home</a>
                     <a href="#features" class="text-gray-300 hover:text-white font-medium transition-colors">Fitur</a>
                     <a href="#pricing" class="text-gray-300 hover:text-white font-medium transition-colors">Harga</a>
+                    <a href="#faq" class="text-gray-300 hover:text-white font-medium transition-colors">FAQ</a>
                     <a href="#contact" class="text-gray-300 hover:text-white font-medium transition-colors">Kontak</a>
                 </div>
 
                 <!-- CTA Buttons -->
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="/login" class="text-gray-300 hover:text-white font-medium transition-colors">Login</a>
-                    <a href="/register" class="btn-glow text-white font-semibold py-2.5 px-6 rounded-xl">
-                        Daftar Gratis
-                    </a>
+                <div class="hidden md:flex items-center gap-3">
+                    <a href="/login"
+                        class="border border-white/40 hover:border-white hover:bg-white/10 text-white font-medium transition-all px-5 py-2.5 rounded-xl">Login</a>
+                    <a href="/register"
+                        class="btn-glow text-white font-semibold py-2.5 px-6 rounded-xl whitespace-nowrap">Daftar
+                        Sekolah</a>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-white/10">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
+                <!-- Mobile Menu Button & Login -->
+                <div class="md:hidden flex items-center space-x-3">
+                    <a href="/login"
+                        class="text-gray-300 hover:text-white font-medium text-sm transition-colors">Login</a>
+                    <button id="mobile-menu-btn" class="p-2 rounded-lg hover:bg-white/10">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -218,11 +224,12 @@
                 <a href="#home" class="block text-gray-300 hover:text-white font-medium py-2">Home</a>
                 <a href="#features" class="block text-gray-300 hover:text-white font-medium py-2">Fitur</a>
                 <a href="#pricing" class="block text-gray-300 hover:text-white font-medium py-2">Harga</a>
+                <a href="#faq" class="block text-gray-300 hover:text-white font-medium py-2">FAQ</a>
                 <a href="#contact" class="block text-gray-300 hover:text-white font-medium py-2">Kontak</a>
                 <hr class="border-white/10 my-3">
                 <a href="/login" class="block text-gray-300 font-medium py-2">Login</a>
                 <a href="/register" class="block btn-glow text-center text-white font-semibold py-3 rounded-xl">Daftar
-                    Gratis</a>
+                    Sekolah</a>
             </div>
         </div>
     </nav>
@@ -267,22 +274,20 @@
                 <div class="flex flex-col sm:flex-row gap-4 justify-center reveal">
                     <a href="/register"
                         class="btn-glow text-white font-semibold text-lg py-4 px-10 rounded-2xl inline-flex items-center justify-center group">
-                        Mulai Gratis 7 Hari
+                        Daftar Sekolah Baru
                         <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
                     </a>
-                    <a href="#features"
-                        class="glass-card text-white font-semibold text-lg py-4 px-10 rounded-2xl inline-flex items-center justify-center hover:bg-white/10 transition-colors">
+                    <a href="/register/join"
+                        class="bg-white/95 hover:bg-white text-teal-700 font-semibold text-lg py-4 px-10 rounded-2xl inline-flex items-center justify-center transition-all shadow-lg hover:shadow-xl">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                         </svg>
-                        Lihat Demo
+                        Gabung ke Sekolah
                     </a>
                 </div>
 
@@ -469,7 +474,7 @@
                     </div>
                     <a href="/register"
                         class="flex-shrink-0 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold text-lg py-4 px-8 rounded-2xl transition-all shadow-lg shadow-green-500/25 hover:shadow-green-500/40">
-                        Mulai Trial Gratis
+                        Daftar Sekolah Gratis
                     </a>
                 </div>
             </div>
@@ -636,12 +641,85 @@
                                 1000 laporan/bulan
                             </li>
                         </ul>
-                        <a href="/register"
+                        <a href="#contact"
                             class="block w-full glass-card text-center text-white font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors mt-auto">
                             Hubungi Kami
                         </a>
                     </div>
                 @endforelse
+
+                <!-- Custom/Enterprise Package -->
+                <div
+                    class="glass-card rounded-3xl p-8 reveal bento-item flex flex-col border-2 border-purple-500/50 relative overflow-hidden">
+                    <!-- Premium Badge -->
+                    <div
+                        class="absolute top-0 right-0 bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs font-bold px-4 py-1 rounded-bl-2xl">
+                        PREMIUM
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-2">Custom Enterprise</h3>
+                        <p class="text-white/70">Untuk sekolah dengan kebutuhan khusus</p>
+                    </div>
+                    <div class="mb-6">
+                        <span
+                            class="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Harga
+                            Custom</span>
+                    </div>
+                    <ul class="space-y-4 mb-8 flex-grow">
+                        <li class="flex items-center text-gray-300">
+                            <svg class="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Unlimited pengguna
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <svg class="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Unlimited laporan/bulan
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <svg class="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Fitur custom sesuai kebutuhan
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <svg class="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Dedicated support 24/7
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <svg class="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Integrasi sistem custom
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <svg class="w-5 h-5 text-purple-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            On-premise deployment (opsional)
+                        </li>
+                    </ul>
+                    <a href="#contact"
+                        class="block w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-center text-white font-semibold py-4 rounded-2xl transition-all mt-auto shadow-lg shadow-purple-500/25">
+                        Hubungi Kami
+                    </a>
+                </div>
             </div>
 
             <!-- Bottom Trial Reminder -->
@@ -654,6 +732,223 @@
                     Semua paket dimulai dengan <span class="text-emerald-400 font-semibold">trial gratis 7 hari</span>
                     tanpa kartu kredit!
                 </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-32 relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-950/20 to-transparent"></div>
+        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="text-center mb-16 reveal">
+                <div class="inline-flex items-center px-4 py-2 glass-card rounded-full mb-6">
+                    <span class="text-cyan-400 text-sm font-medium inline-flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Tanya Jawab
+                    </span>
+                </div>
+                <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+                    Pertanyaan <span class="gradient-text">Umum</span>
+                </h2>
+                <p class="text-xl text-white/70">
+                    Temukan jawaban untuk pertanyaan yang sering diajukan
+                </p>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="space-y-4 reveal">
+                <!-- FAQ Item 1 -->
+                <div class="glass-card rounded-2xl overflow-hidden faq-item">
+                    <button
+                        class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-white/5 transition-colors">
+                        <span class="text-lg font-semibold text-white pr-8">Apakah data siswa aman di e-Report?</span>
+                        <svg class="faq-icon w-6 h-6 text-cyan-400 flex-shrink-0 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden">
+                        <div class="px-6 pb-6 text-white/70">
+                            <p>Ya, keamanan data adalah prioritas utama kami. e-Report menggunakan enkripsi end-to-end
+                                untuk melindungi semua data siswa. Kami juga melakukan backup otomatis setiap hari dan
+                                menyimpan audit log lengkap untuk setiap aktivitas. Server kami dilindungi dengan
+                                firewall tingkat enterprise dan sertifikat SSL untuk koneksi yang aman.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="glass-card rounded-2xl overflow-hidden faq-item">
+                    <button
+                        class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-white/5 transition-colors">
+                        <span class="text-lg font-semibold text-white pr-8">Bagaimana cara pembayaran untuk
+                            berlangganan?</span>
+                        <svg class="faq-icon w-6 h-6 text-cyan-400 flex-shrink-0 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden">
+                        <div class="px-6 pb-6 text-white/70">
+                            <p>Kami menerima berbagai metode pembayaran untuk kemudahan Anda: transfer bank (BCA,
+                                Mandiri, BNI, BRI), e-wallet (GoPay, OVO, Dana), dan kartu kredit/debit. Pembayaran
+                                dilakukan secara bulanan atau tahunan (dengan diskon khusus). Setelah trial gratis 7
+                                hari berakhir, Anda akan menerima invoice untuk pembayaran pertama.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="glass-card rounded-2xl overflow-hidden faq-item">
+                    <button
+                        class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-white/5 transition-colors">
+                        <span class="text-lg font-semibold text-white pr-8">Apakah bisa dicoba gratis dulu sebelum
+                            berlangganan?</span>
+                        <svg class="faq-icon w-6 h-6 text-cyan-400 flex-shrink-0 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden">
+                        <div class="px-6 pb-6 text-white/70">
+                            <p>Tentu saja! Kami menyediakan trial gratis selama 7 hari dengan akses penuh ke semua fitur
+                                premium. Tidak perlu kartu kredit untuk mendaftar trial. Anda bisa mengeksplorasi semua
+                                fitur, menambahkan pengguna, dan membuat laporan untuk merasakan langsung bagaimana
+                                e-Report dapat membantu sekolah Anda. Setelah trial berakhir, Anda bebas memilih paket
+                                yang sesuai atau membatalkan tanpa biaya.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="glass-card rounded-2xl overflow-hidden faq-item">
+                    <button
+                        class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-white/5 transition-colors">
+                        <span class="text-lg font-semibold text-white pr-8">Apa perbedaan antara paket Starter,
+                            Professional, dan Enterprise?</span>
+                        <svg class="faq-icon w-6 h-6 text-cyan-400 flex-shrink-0 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden">
+                        <div class="px-6 pb-6 text-white/70">
+                            <p>Perbedaan utama terletak pada jumlah pengguna dan laporan per bulan.
+                                <strong>Starter</strong> cocok untuk sekolah kecil (hingga 25 pengguna, 50
+                                laporan/bulan). <strong>Professional</strong> untuk sekolah menengah (hingga 100
+                                pengguna, 200 laporan/bulan) dengan fitur analytics lebih lengkap.
+                                <strong>Enterprise</strong> untuk sekolah besar (hingga 500 pengguna, 1000
+                                laporan/bulan) dengan prioritas support. Untuk kebutuhan khusus, tersedia paket
+                                <strong>Custom</strong> dengan unlimited users dan fitur custom.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="glass-card rounded-2xl overflow-hidden faq-item">
+                    <button
+                        class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-white/5 transition-colors">
+                        <span class="text-lg font-semibold text-white pr-8">Bagaimana cara mendaftar dan memulai
+                            menggunakan e-Report?</span>
+                        <svg class="faq-icon w-6 h-6 text-cyan-400 flex-shrink-0 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden">
+                        <div class="px-6 pb-6 text-white/70">
+                            <p>Sangat mudah! Klik tombol "Daftar Sekolah Baru" jika Anda admin sekolah yang ingin
+                                membuat akun baru. Isi informasi sekolah dan data admin, lalu Anda langsung bisa
+                                mengakses dashboard. Untuk guru, staf, atau siswa yang ingin bergabung ke sekolah yang
+                                sudah terdaftar, klik "Gabung ke Sekolah" dan masukkan kode sekolah yang diberikan oleh
+                                admin. Proses setup hanya membutuhkan waktu kurang dari 5 menit!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 6 -->
+                <div class="glass-card rounded-2xl overflow-hidden faq-item">
+                    <button
+                        class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-white/5 transition-colors">
+                        <span class="text-lg font-semibold text-white pr-8">Apakah ada dukungan teknis jika mengalami
+                            kendala?</span>
+                        <svg class="faq-icon w-6 h-6 text-cyan-400 flex-shrink-0 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden">
+                        <div class="px-6 pb-6 text-white/70">
+                            <p>Tentu! Tim support kami siap membantu Anda melalui berbagai channel: email
+                                (support@ereport.systems), WhatsApp (+62 899 077 2526), dan live chat di dalam aplikasi.
+                                Untuk paket Professional dan Enterprise, Anda mendapatkan prioritas support dengan
+                                response time lebih cepat. Kami juga menyediakan dokumentasi lengkap dan video tutorial
+                                untuk membantu Anda memaksimalkan penggunaan e-Report.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 7 -->
+                <div class="glass-card rounded-2xl overflow-hidden faq-item">
+                    <button
+                        class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-white/5 transition-colors">
+                        <span class="text-lg font-semibold text-white pr-8">Berapa lama waktu yang dibutuhkan untuk
+                            setup dan implementasi?</span>
+                        <svg class="faq-icon w-6 h-6 text-cyan-400 flex-shrink-0 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden">
+                        <div class="px-6 pb-6 text-white/70">
+                            <p>e-Report dirancang untuk langsung bisa digunakan (plug-and-play). Setelah mendaftar, Anda
+                                bisa langsung mulai menggunakan sistem dalam hitungan menit. Untuk setup lengkap
+                                termasuk import data siswa dan guru, biasanya membutuhkan waktu 1-2 hari kerja. Tim kami
+                                akan membantu proses onboarding dan memberikan training dasar kepada admin dan pengguna
+                                utama agar bisa langsung produktif.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 8 -->
+                <div class="glass-card rounded-2xl overflow-hidden faq-item">
+                    <button
+                        class="faq-question w-full text-left p-6 flex justify-between items-center hover:bg-white/5 transition-colors">
+                        <span class="text-lg font-semibold text-white pr-8">Apakah e-Report bisa diintegrasikan dengan
+                            sistem lain yang sudah ada?</span>
+                        <svg class="faq-icon w-6 h-6 text-cyan-400 flex-shrink-0 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden">
+                        <div class="px-6 pb-6 text-white/70">
+                            <p>Ya, e-Report menyediakan API untuk integrasi dengan sistem lain seperti sistem akademik,
+                                absensi, atau PPDB. Kami juga mendukung import/export data dalam format Excel dan CSV
+                                untuk memudahkan migrasi data. Untuk kebutuhan integrasi khusus atau custom, silakan
+                                hubungi tim kami untuk mendiskusikan solusi yang sesuai dengan infrastruktur IT sekolah
+                                Anda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA after FAQ -->
+            <div class="text-center mt-12 reveal">
+                <p class="text-white/70 mb-6">Masih ada pertanyaan lain?</p>
+                <a href="#contact"
+                    class="inline-flex items-center gap-2 btn-glow text-white font-semibold py-3 px-8 rounded-xl">
+                    Hubungi Kami
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </a>
             </div>
         </div>
     </section>
@@ -802,6 +1097,7 @@
                     <ul class="space-y-3">
                         <li><a href="#features" class="text-white/70 hover:text-white transition-colors">Fitur</a></li>
                         <li><a href="#pricing" class="text-white/70 hover:text-white transition-colors">Harga</a></li>
+                        <li><a href="#faq" class="text-white/70 hover:text-white transition-colors">FAQ</a></li>
                         <li><a href="/register" class="text-white/70 hover:text-white transition-colors">Daftar</a></li>
                     </ul>
                 </div>
@@ -844,6 +1140,14 @@
             </div>
         </div>
     </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top"
+        class="fixed bottom-8 right-8 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 invisible z-40 hover:scale-110">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+    </button>
 
     <script>
         /* Multi-Language Dropdown Logic */
@@ -986,6 +1290,53 @@
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     document.getElementById('mobile-menu').classList.add('hidden');
                 }
+            });
+        });
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', function () {
+                const faqItem = this.closest('.faq-item');
+                const answer = faqItem.querySelector('.faq-answer');
+                const icon = this.querySelector('.faq-icon');
+                const isOpen = !answer.classList.contains('hidden');
+
+                // Close all other FAQs (optional - remove if you want multiple open)
+                document.querySelectorAll('.faq-answer').forEach(ans => {
+                    if (ans !== answer) {
+                        ans.classList.add('hidden');
+                        ans.closest('.faq-item').querySelector('.faq-icon').style.transform = 'rotate(0deg)';
+                    }
+                });
+
+                // Toggle current FAQ
+                if (isOpen) {
+                    answer.classList.add('hidden');
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    answer.classList.remove('hidden');
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+
+        // Back to Top Button
+        const backToTopBtn = document.getElementById('back-to-top');
+
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('opacity-0', 'invisible');
+                backToTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'invisible');
+                backToTopBtn.classList.remove('opacity-100', 'visible');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', function () {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
             });
         });
     </script>

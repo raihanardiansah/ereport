@@ -17,7 +17,7 @@
                         class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4v1m6 11h2m-6 0h-2v4m-2 0h-2m-2-4H6m6 0v4m6-11V9m0 0h2m-2 0h-2M9 3h6m-6 0v2m0-2H6m9 0v2m0-2h3M9 3H6m0 0v3M6 3H3v3m3-3v3m0-3H3m6 18v-2m0 2v-2m0 2h3m-3 0h-3m9-18h3v3m0-3v3m0-3h-3M3 21v-3m0 0h3m-3 0v-3m0 3h3m18 0v-3m0 0h-3m3 0v-3m0 3h-3" />
+                                d="M4 4m0 1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z M14 4m0 1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z M4 14m0 1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z M14 17h6 M17 14v6" />
                         </svg>
                     </div>
                     Pengaturan QR Code
