@@ -200,7 +200,7 @@
                     <a href="/login"
                         class="border border-white/40 hover:border-white hover:bg-white/10 text-white font-medium transition-all px-5 py-2.5 rounded-xl">Login</a>
                     <a href="/register"
-                        class="btn-glow text-white font-semibold py-2.5 px-6 rounded-xl whitespace-nowrap">Daftar
+                        class="btn-glow border border-white/40 text-white font-semibold py-2.5 px-6 rounded-xl whitespace-nowrap hover:bg-white/10 transition-all">Daftar
                         Sekolah</a>
                 </div>
 
